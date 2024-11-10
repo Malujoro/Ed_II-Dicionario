@@ -1,0 +1,35 @@
+{
+    "tasks": [
+        {
+            "type": "cppbuild",
+            "label": "C/C++: gcc arquivo de build ativo",
+            "command": "/usr/bin/gcc",
+            "args": [
+                "-fdiagnostics-color=always",
+                "-g",
+                "${file}",
+                "-o",
+                "${fileDirname}/${fileBasenameNoExtension}",
+                // "${fileDirname}/lista_alunos/lista.c",
+                // "${fileDirname}/arvore/arvore.c",
+                // "${fileDirname}/../extras/extras.c",
+                // "${fileDirname}/cadastro/cadastro.c",
+                // "${fileDirname}/exibir/exibir.c",
+                // "${fileDirname}/remover/remover.c",
+                // "${fileDirname}/menu/menu.c",
+            ],
+            "options": {
+                "cwd": "${fileDirname}"
+            },
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "detail": "Tarefa gerada pelo Depurador."
+        }
+    ],
+    "version": "2.0.0"
+}
