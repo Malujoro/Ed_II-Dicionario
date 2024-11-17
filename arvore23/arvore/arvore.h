@@ -18,11 +18,11 @@ typedef struct arvore23
 
 Arvore23 *no23_alocar();
 
-Arvore23 *no23_criar(Data info);
+Arvore23 *no23_criar(Data info, Arvore23 *filho_esquerdo, Arvore23 *filho_centro);
 
 Arvore23 *arvore23_criar();
 
-void arvore23_desaloca(Arvore23 **raiz);
+void arvore23_desalocar(Arvore23 **raiz);
 
 int arvore23_inserir();
 
