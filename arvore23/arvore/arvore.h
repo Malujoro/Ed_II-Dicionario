@@ -24,7 +24,7 @@ Arvore23 *arvore23_criar();
 
 void arvore23_desalocar(Arvore23 **raiz);
 
-int arvore23_inserir();
+Arvore23 *arvore23_inserir(Arvore23 **raiz, Data info, Arvore23 *pai, Data *promove);
 
 
 int arvore23_remover();
