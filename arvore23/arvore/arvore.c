@@ -344,45 +344,43 @@ int arvore23_remover(Arvore23 **raiz, int info, Arvore23 *pai, Arvore23 *origem)
                 {
                     if(possivel_remover((*raiz)->esquerdo))
                         filho = buscar_maior_filho((*raiz)->esquerdo, pai_aux, &info_aux);
-                    else
-                    {
+                    else if(possivel_remover((*raiz)->centro))
                         filho = buscar_menor_filho((*raiz)->centro, pai_aux, &info_aux);
-
-                        if(filho->n_infos == 1 && (*raiz)->n_infos == 1)
+                    else if((*raiz)->n_infos == 1)
+                    {
+                        if(pai != NULL)
                         {
-                            if(pai != NULL)
+                            if(*raiz == pai->esquerdo || (pai->n_infos == 2 && (*raiz == pai->centro)))
                             {
-                                if(*raiz == pai->esquerdo || (pai->n_infos == 2 && *raiz == pai->centro))
-                                {
-                                    pai_aux = buscar_pai(origem, pai->info1.numero);
+                                filho = buscar_menor_filho((*raiz)->centro, pai_aux, &info_aux);
+                                pai_aux = buscar_pai(origem, pai->info1.numero);
 
-                                    if(*raiz == pai->esquerdo)
-                                        movimento_onda(pai->info1, &(filho->info2), pai_aux, origem, origem);
-                                    else
-                                        movimento_onda(pai->info2, &(filho->info2), pai_aux, origem, origem);
-                                }
+                                if(*raiz == pai->esquerdo)
+                                    movimento_onda(pai->info1, &(filho->info2), pai_aux, origem, origem);
                                 else
-                                {
-                                    filho = buscar_maior_filho((*raiz)->esquerdo, pai_aux, &info_aux);
-                                    pai_aux = buscar_pai(origem, pai->info1.numero);
-
-                                    filho->info2 = filho->info1;
-                                    if(*raiz == pai->direito)
-                                        movimento_onda(pai->info2, &(filho->info1), pai_aux, origem, origem);
-                                    else
-                                        movimento_onda(pai->info1, &(filho->info1), pai_aux, origem, origem);
-                                }
+                                    movimento_onda(pai->info2, &(filho->info2), pai_aux, origem, origem);
                             }
-                            // TODO falta fazer (Juntar nó ~Levar em conta o caso de árvore "grande")
-                            // else
-                            // {
-                            //     juntar_no();
-                            //     juntar = 1;
-                            // }
+                            else
+                            {
+                                filho = buscar_maior_filho((*raiz)->esquerdo, pai_aux, &info_aux);
+                                pai_aux = buscar_pai(origem, pai->info1.numero);
+
+                                filho->info2 = filho->info1;
+                                if(pai->n_infos == 2 && (*raiz == pai->direito))
+                                    movimento_onda(pai->info2, &(filho->info1), pai_aux, origem, origem);
+                                else
+                                    movimento_onda(pai->info1, &(filho->info1), pai_aux, origem, origem);
+                            }
                         }
+                        // TODO falta fazer (Juntar nó ~Levar em conta o caso de árvore "grande")
+                        // else
+                        // {
+                        //     juntar_no();
+                        //     juntar = 1;
+                        // }
                     }
 
-                    if(!juntar)
+                    if(pai != NULL && !juntar)
                         movimento_onda(info_aux, &((*raiz)->info1), pai_aux, origem, &filho);
                 }
             }
