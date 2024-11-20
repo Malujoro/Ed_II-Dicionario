@@ -7,6 +7,23 @@ int eh_folha(Arvore23 no)
     return no.esquerdo == NULL;
 }
 
+int eh_info1(Arvore23 no, int info)
+{
+    return info == no.info1.numero;
+}
+
+int eh_info2(Arvore23 no, int info)
+{
+    return no.n_infos == 2 && info == no.info2.numero;
+}
+
+void troca_infos(Data *info1, Data *info2)
+{
+    Data aux = *info1;
+    *info1 = *info2;
+    *info2 = aux;
+}
+
 Arvore23 *no23_alocar()
 {
     Arvore23 *no;
@@ -76,6 +93,47 @@ void no23_adicionar_info(Arvore23 *no, Data info, Arvore23 *filho_maior)
         no->info1 = info;
     }
     no->n_infos = 2;
+}
+
+Arvore23 *buscar_menor_filho(Arvore23 *raiz, Arvore23 *pai)
+{
+    Arvore23 *filho;
+    pai = raiz;
+    filho = raiz->esquerdo;
+
+    while(filho != NULL && filho->esquerdo != NULL)
+    {
+        pai = filho;
+        filho = filho->esquerdo;
+    }
+    
+    return filho;
+}
+
+Arvore23 *maior_filho(Arvore23 *raiz)
+{
+    return raiz->n_infos == 2 ? raiz->direito : raiz->centro;
+}
+
+Arvore23 *buscar_maior_filho(Arvore23 *raiz, Arvore23 *pai)
+{
+    Arvore23 *filho;
+    pai = raiz;
+    filho = maior_filho(raiz);
+
+    while(filho != NULL && maior_filho(filho) != NULL)
+    {
+        pai = filho;
+        filho = maior_filho(filho);
+    }
+    
+    return filho;
+}
+
+void movimento_onda(Data saida, Data *entrada, Arvore23 **origem)
+{
+    arvore23_remover(origem, saida.numero, NULL, origem);
+    *entrada = saida;
 }
 
 Arvore23 *arvore23_criar()
@@ -154,6 +212,134 @@ Arvore23 *arvore23_inserir(Arvore23 **raiz, Data info, Arvore23 *pai, Data *prom
     }
 
     return maior;
+}
+
+int possivel_remover(Arvore23 *raiz)
+{
+    int possivel = 0;
+
+    if(raiz != NULL)
+    {
+        possivel = raiz->n_infos == 2;
+
+        if(!possivel)
+            possivel = possivel_remover(raiz->centro);
+
+            if(!possivel)
+                possivel = possivel_remover(raiz->esquerdo);
+    }
+
+    return possivel;
+}
+
+int arvore23_remover(Arvore23 **raiz, int info, Arvore23 *pai, Arvore23 *origem)
+{
+    // int existe = 0, possivel;
+    // possivel = possivel_remover(*raiz, info, &existe);
+    // if(existe && possivel)
+    // {
+    // }
+    int removeu = 0;
+
+    if(*raiz != NULL)
+    {
+        int info1 = eh_info1(**raiz, info);
+        int info2 = eh_info2(**raiz, info);
+        Data info_aux;
+
+        if(info1 || info2)
+        {
+            if(eh_folha(**raiz))
+            {
+                if((*raiz)->n_infos == 2)
+                {
+                    if(info1)
+                        troca_infos(&((*raiz)->info1), &((*raiz)->info2));
+
+                    (*raiz)->n_infos = 1;
+                }
+                else
+                {
+                    if(pai != NULL)
+                    {
+                        if(*raiz == pai->esquerdo)
+                            movimento_onda(pai->info1, &((*raiz)->info1), origem);
+                        else
+                        {
+                            if(pai->n_infos == 2)
+                            {
+                                if(*raiz == pai->centro)
+                                    movimento_onda(pai->info2, &((*raiz)->info1), origem);
+                        // TODO talvez tenha que fazer ajustes (movimentação estranha na minha cabeça)
+                                else
+                                    movimento_onda(pai->info2, &((*raiz)->centro->info2), origem);
+                                    // Movimentação "Original"
+                                    // movimento_onda(pai->info2, &((*raiz)->info2), origem);
+                            }
+                            else
+                                movimento_onda(pai->info1, &((*raiz)->esquerdo->info2), origem);
+                        }
+                    }
+                    else
+                    {
+                        free(*raiz);
+                        *raiz = NULL;
+                    }
+                }
+            }
+            else
+            {
+                if(info2)
+                {
+                    Arvore23 *pai, *filho;
+                    filho = buscar_menor_filho((*raiz)->direito, pai);
+                    if(filho->n_infos == 2)
+                    {
+                        info_aux = filho->info1;
+                        arvore23_remover(&filho, info_aux.numero, pai, origem);
+                        (*raiz)->info2 = info_aux;
+                    }
+                    // TODO falta fazer (Situação em que deve puxar a recursão para remover o pai do filho)
+                    else if(possivel_remover((*raiz)->direito))
+                    {
+                        info_aux = filho->info1;
+                        arvore23_remover(&filho, info_aux.numero, pai, origem);
+                        (*raiz)->info2 = info_aux;
+                    }
+                    else
+                    {
+                        filho = buscar_maior_filho((*raiz)->centro, pai);
+                        if(filho->n_infos == 2)
+                        {
+                            info_aux = filho->info2;
+                            arvore23_remover(&filho, info_aux.numero, pai, origem);
+                            (*raiz)->info2 = info_aux;
+                        }
+                        // TODO falta fazer (Situação em que deve puxar a recursão para remover o pai do filho)
+                        // else if(possivel_remover((*raiz)->centro))
+                        // {
+                        // }
+                        // TODO falta fazer (Juntar nó ~Levar em conta o caso de árvore "grande")
+                        // else
+                        // {
+                        // }
+                    }
+
+                }
+            }
+        }
+        else
+        {
+            if(info < (*raiz)->info1.numero)
+                removeu = arvore23_remover(&(*raiz)->esquerdo, info, pai, origem);
+            else if((*raiz)->n_infos == 1 || info < (*raiz)->info2.numero)
+                removeu = arvore23_remover(&(*raiz)->centro, info, pai, origem);
+            else
+                removeu = arvore23_remover(&(*raiz)->direito, info, pai, origem);
+        }
+    }
+
+    return removeu;
 }
 
 void arvore23_exibir_pre(Arvore23 *raiz)
