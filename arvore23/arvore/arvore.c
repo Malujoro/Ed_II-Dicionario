@@ -38,6 +38,12 @@ Arvore23 *no23_alocar()
     return no;
 }
 
+void no23_desalocar(Arvore23 **no)
+{
+    free(*no);
+    *no = NULL;
+}
+
 Arvore23 *no23_criar(Data info, Arvore23 *filho_esquerdo, Arvore23 *filho_centro)
 {
     Arvore23 *no;
@@ -77,25 +83,24 @@ Arvore23 *no23_quebrar(Arvore23 *no, Data info, Data *promove, Arvore23 *filho_m
     return maior;
 }
 
-Arvore23 *no23_juntar(Arvore23 *raiz, Data *promove)
+Arvore23 *no23_juntar(Arvore23 *filho1, Arvore23 *filho2, Arvore23 **filho3)
 {
     Arvore23 *maior;
     maior = NULL;
 
-    if(!eh_folha(*(raiz->centro)))
+    if(!eh_folha(*filho2))
     {
-        maior = no23_juntar(raiz->centro, promove);
+        maior = no23_juntar(filho2->esquerdo, filho2->centro, &(filho1->direito));
 
-        Data aux = *promove;
-        *promove = maior->info1;
+        Data aux = filho2->info1;
+        filho2->info1 = maior->info1;
         maior->info1 = aux;
     }
 
-    raiz->esquerdo->info2 = raiz->centro->info1;
-    *promove = raiz->info1;
-    maior = raiz->esquerdo;
-    raiz->direito = maior;
-    no23_desalocar(&(raiz->centro));
+    filho1->info2 = filho2->info1;
+    maior = filho1;
+    *filho3 = maior;
+    no23_desalocar(&filho2);
     
     return maior;
 }
@@ -196,12 +201,6 @@ Arvore23 *arvore23_criar()
     return NULL;
 }
 
-void no23_desalocar(Arvore23 **no)
-{
-    free(*no);
-    *no = NULL;
-}
-
 void arvore23_desalocar(Arvore23 **raiz)
 {
     if(*raiz != NULL)
@@ -283,10 +282,12 @@ int possivel_remover(Arvore23 *raiz)
         possivel = raiz->n_infos == 2;
 
         if(!possivel)
+        {
             possivel = possivel_remover(raiz->centro);
 
             if(!possivel)
                 possivel = possivel_remover(raiz->esquerdo);
+        }
     }
 
     return possivel;
@@ -354,11 +355,11 @@ int arvore23_remover(Arvore23 **raiz, int info, Arvore23 *pai, Arvore23 **origem
                     else if(possivel_remover((*raiz)->centro))
                         filho = buscar_maior_filho((*raiz)->centro, &pai_aux, &info_aux);
                     // TODO falta fazer (Juntar nó ~Levar em conta o caso de árvore "grande")
-                    // else
-                    // {
-                    //     juntar_no();
-                    //     juntar = 1;
-                    // }
+                    else
+                    {
+                        no23_juntar((*raiz)->centro, (*raiz)->direito, &(*raiz)->centro);
+                        juntar = 1;
+                    }
 
                     if(!juntar)
                         movimento_onda(info_aux, &((*raiz)->info2), pai_aux, origem, &filho);
@@ -376,7 +377,7 @@ int arvore23_remover(Arvore23 **raiz, int info, Arvore23 *pai, Arvore23 **origem
                             if(*raiz == pai->esquerdo || (pai->n_infos == 2 && (*raiz == pai->centro)))
                             {
                                 filho = buscar_menor_filho((*raiz)->centro, &pai_aux, &info_aux);
-                                pai_aux = buscar_pai(origem, pai->info1.numero);
+                                pai_aux = buscar_pai(*origem, pai->info1.numero);
 
                                 if(*raiz == pai->esquerdo)
                                     movimento_onda(pai->info1, &(filho->info2), pai_aux, origem, origem);
@@ -386,7 +387,7 @@ int arvore23_remover(Arvore23 **raiz, int info, Arvore23 *pai, Arvore23 **origem
                             else
                             {
                                 filho = buscar_maior_filho((*raiz)->esquerdo, &pai_aux, &info_aux);
-                                pai_aux = buscar_pai(origem, pai->info1.numero);
+                                pai_aux = buscar_pai(*origem, pai->info1.numero);
 
                                 filho->info2 = filho->info1;
                                 if(pai->n_infos == 2 && (*raiz == pai->direito))
@@ -396,11 +397,16 @@ int arvore23_remover(Arvore23 **raiz, int info, Arvore23 *pai, Arvore23 **origem
                             }
                         }
                         // TODO falta fazer (Juntar nó ~Levar em conta o caso de árvore "grande")
-                        // else
-                        // {
-                        //     juntar_no();
-                        //     juntar = 1;
-                        // }
+                        else
+                        {
+                            Arvore23 *aux;
+                            aux = *raiz;
+
+                            no23_juntar((*raiz)->esquerdo, (*raiz)->centro, raiz);
+                            juntar = 1;
+                            
+                            no23_desalocar(&aux);
+                        }
                     }
 
                     if(pai != NULL && !juntar)
