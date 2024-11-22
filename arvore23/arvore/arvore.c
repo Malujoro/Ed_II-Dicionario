@@ -355,7 +355,6 @@ int arvore23_remover(Arvore23 **raiz, int info, Arvore23 *pai, Arvore23 **origem
                         filho = buscar_menor_filho((*raiz)->direito, &pai_aux, &info_aux);
                     else if(possivel_remover((*raiz)->centro))
                         filho = buscar_maior_filho((*raiz)->centro, &pai_aux, &info_aux);
-                    // TODO falta fazer (Juntar nó ~Levar em conta o caso de árvore "grande")
                     else
                     {
                         no23_juntar((*raiz)->centro, (*raiz)->direito, &(*raiz)->centro);
@@ -398,7 +397,6 @@ int arvore23_remover(Arvore23 **raiz, int info, Arvore23 *pai, Arvore23 **origem
                                     movimento_onda(pai->info1, &(filho->info1), pai_aux, origem, origem);
                             }
                         }
-                        // TODO falta fazer (Juntar nó ~Levar em conta o caso de árvore "grande")
                         else
                         {
                             Arvore23 *aux;
@@ -487,8 +485,12 @@ int main()
     // tam = 26;
     // int valores[] = {8000, 10000, 15000, 1000, 3000, 7000, 5800, 4200, 2500, 1800, 9000, 7500, 6500, 4300, 3500, 9500, 2100, 500, 900, 100, 600, 1700, 2400, 1250, 1750, 250};
 
-    tam = 8;
-    int valores[] = {10, 60, 50, 30, 150, 100, 80, 200};
+    // tam = 8;
+    // int valores[] = {30, 120, 100, 50, 170, 150, 140, 200};
+
+    tam = 26;
+    int valores[] = {8000, 10000, 15000, 1000, 3000, 7000, 5800, 4200, 2500, 1800, 9000, 7500, 6500, 4300, 3500, 9500, 2100, 500, 900, 100, 600, 1700, 2400, 1250, 1750, 250};
+
 
     Arvore23 *arvore;
     arvore = arvore23_criar();
