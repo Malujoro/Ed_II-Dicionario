@@ -33,4 +33,8 @@ Arvore23 *arvore23_buscar();
 
 void arvore23_exibir();
 
+Arvore23 *buscar_menor_filho(Arvore23 *raiz, Arvore23 **pai, Data *menor_info);
+void movimento_onda(Data saindo, Data *entrada, Arvore23 *pai, Arvore23 **origem, Arvore23 **raiz);
+
+
 #endif
