@@ -192,7 +192,7 @@ Arvore23 *buscar_maior_pai(Arvore23 *origem, Arvore23 *pai, int info, Data *maio
 
 int movimento_onda(Data saindo, Data *entrada, Arvore23 *pai, Arvore23 **origem, Arvore23 **raiz, Arvore23 **maior)
 {
-    int removeu = arvore23_remover(raiz, saindo.numero, pai, origem, maior);
+    int removeu = arvore23_remover1(raiz, saindo.numero, pai, origem, maior);
     *entrada = saindo;
     return removeu;
 }
@@ -293,7 +293,7 @@ int possivel_remover(Arvore23 *raiz)
     return possivel;
 }
 
-int arvore23_remover(Arvore23 **raiz, int info, Arvore23 *pai, Arvore23 **origem, Arvore23 **maior)
+int arvore23_remover1(Arvore23 **raiz, int info, Arvore23 *pai, Arvore23 **origem, Arvore23 **maior)
 {
     int removeu = 0;
 
@@ -343,6 +343,7 @@ int arvore23_remover(Arvore23 **raiz, int info, Arvore23 *pai, Arvore23 **origem
                             else
                             {
                                 (*raiz)->n_infos = 0;
+                                removeu = -1;
                                 // TODO desalocar verificando
                                 // no23_desalocar(raiz);
                             }
@@ -401,35 +402,35 @@ int arvore23_remover(Arvore23 **raiz, int info, Arvore23 *pai, Arvore23 **origem
         else
         {
             if(info < (*raiz)->info1.numero)
-                removeu = arvore23_remover(&(*raiz)->esquerdo, info, *raiz, origem, maior);
+                removeu = arvore23_remover1(&(*raiz)->esquerdo, info, *raiz, origem, maior);
             else
             {
                 if((*raiz)->n_infos == 1 || info < (*raiz)->info2.numero)
-                    removeu = arvore23_remover(&(*raiz)->centro, info, *raiz, origem, maior);
+                    removeu = arvore23_remover1(&(*raiz)->centro, info, *raiz, origem, maior);
                 else
-                    removeu = arvore23_remover(&(*raiz)->direito, info, *raiz, origem, maior);
+                    removeu = arvore23_remover1(&(*raiz)->direito, info, *raiz, origem, maior);
             }
         }
     }
 
-    if(*raiz != NULL && !eh_folha(**raiz))
-    {
-        if((*raiz)->n_infos == 1 && ((*raiz)->centro == NULL || (*raiz)->centro->n_infos == 0))
-        {
-            if((*raiz)->centro != NULL)
-                no23_desalocar(&((*raiz)->centro));
-            *maior = no23_juntar((*raiz)->esquerdo, (*raiz)->info1, *maior, raiz);
-        }
-        else if((*raiz)->n_infos == 2 && ((*raiz)->direito == NULL || (*raiz)->direito->n_infos == 0))
-        {
-            if((*raiz)->direito != NULL)
-                no23_desalocar(&((*raiz)->direito));
-            *maior = no23_juntar((*raiz)->centro, (*raiz)->info2, *maior, raiz);
-        }
-    }
+    // if(*raiz != NULL && !eh_folha(**raiz))
+    // {
+    //     if((*raiz)->n_infos == 1 && ((*raiz)->centro == NULL || (*raiz)->centro->n_infos == 0))
+    //     {
+    //         if((*raiz)->centro != NULL)
+    //             no23_desalocar(&((*raiz)->centro));
+    //         *maior = no23_juntar((*raiz)->esquerdo, (*raiz)->info1, *maior, raiz);
+    //     }
+    //     else if((*raiz)->n_infos == 2 && ((*raiz)->direito == NULL || (*raiz)->direito->n_infos == 0))
+    //     {
+    //         if((*raiz)->direito != NULL)
+    //             no23_desalocar(&((*raiz)->direito));
+    //         *maior = no23_juntar((*raiz)->centro, (*raiz)->info2, *maior, raiz);
+    //     }
+    // }
 
-    if(*origem == NULL)
-        *origem = *maior;
+    // if(*origem == NULL)
+    //     *origem = *maior;
 
     return removeu;
 }
@@ -441,7 +442,7 @@ int arvore23_remover(Arvore23 **raiz, int info, Arvore23 *pai, Arvore23 **origem
     Caso precise de balanceamento e seja possível remover, executa uma "remoção reversa" para ocupar o espaço que tá Nulo (com n_infos = 0) 
 */
 
-int rebalancear(Arvore23 **raiz, Arvore23 **maior)
+int arvore23_rebalancear(Arvore23 **raiz, Arvore23 **maior)
 {
     int balanceou = 0;
     if(*raiz != NULL)
@@ -450,24 +451,31 @@ int rebalancear(Arvore23 **raiz, Arvore23 **maior)
         {
             if((*raiz)->n_infos == 1)
             {
-                balanceou = rebalancear(&((*raiz)->centro), maior);
-                if((*raiz)->centro == NULL)
+                balanceou = arvore23_rebalancear(&((*raiz)->centro), maior);
+                if((*raiz)->centro == NULL || (*raiz)->centro->n_infos == 0)
                 {
+                    if((*raiz)->centro != NULL)
+                        no23_desalocar(&((*raiz)->centro));
+
                     *maior = no23_juntar((*raiz)->esquerdo, (*raiz)->info1, *maior, raiz);
                     balanceou = 1;
                 }
             }
             else if((*raiz)->n_infos == 2)
             {
-                balanceou = rebalancear(&((*raiz)->direito), maior);
-                if((*raiz)->direito == NULL)
+                balanceou = arvore23_rebalancear(&((*raiz)->direito), maior);
+                if((*raiz)->direito == NULL || (*raiz)->direito->n_infos == 0)
                 {
+                    if((*raiz)->direito != NULL)
+                        no23_desalocar(&((*raiz)->direito));
+
                     *maior = no23_juntar((*raiz)->centro, (*raiz)->info2, *maior, raiz);
                     balanceou = 1;
                 }
             }
         }
     }
+
     return balanceou;
 }
 
@@ -516,6 +524,25 @@ void arvore23_exibir_pos(Arvore23 *raiz)
         if(raiz->n_infos == 2)
             printf("[2º] %d -> ", raiz->info2.numero);
     }
+}
+
+
+int arvore23_remover(Arvore23 **raiz, int info)
+{   
+    Arvore23 *maior;
+    maior = NULL;
+    int removeu = arvore23_remover1(raiz, info, NULL, raiz, &maior);
+
+    if(removeu == -1)
+    {
+        removeu = arvore23_rebalancear(raiz, &maior);
+        if(*raiz == NULL)
+            *raiz = maior;
+    }
+    
+    // if(removeu)
+
+    return removeu;
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////
@@ -680,11 +707,12 @@ int main1()
     int tam;
 
     // int valores[] = {5000, 4000, 1000, 2000, 1500, 500, 300, 6000, 8000, 7000};
-    int valores[] = {8000, 10000, 15000, 1000, 3000, 7000, 5800, 4200, 2500, 1800, 9000, 7500, 6500, 4300, 3500, 9500, 2100, 500, 900, 100, 600, 1700, 2400, 1250, 1750, 250};
+    // int valores[] = {8000, 10000, 15000, 1000, 3000, 7000, 5800, 4200, 2500, 1800, 9000, 7500, 6500, 4300, 3500, 9500, 2100, 500, 900, 100, 600, 1700, 2400, 1250, 1750, 250};
     // int valores[] = {30, 120, 100, 50, 170, 150, 140, 200};
+    int valores[] = {2, 4, 7, 3, 1, 6, 5};
     tam = sizeof(valores) / sizeof(int);
 
-    Arvore23 *arvore, *maior;
+    Arvore23 *arvore;
     arvore = arvore23_criar();
     Data *promove = (Data *) malloc(sizeof(Data));
 
@@ -698,10 +726,11 @@ int main1()
     printf("\n\nÁrvore após inserção: \n");
     arvore23_exibir_pre(arvore);
 
-
-    for(int i = tam-1; i >= 0; i--)
+    // for(int i = tam-1; i >= 0; i--)
+    for(int i = 0; i >= 0; i--)
     {
-        arvore23_remover(&arvore, valores[i], NULL, &arvore, &maior);
+        arvore23_remover(&arvore, valores[i]);
+        // arvore23_remover1(&arvore, valores[i], NULL, &arvore, &maior);
         printf("\n\nÁrvore após remover %d:\n", valores[i]);
         arvore23_exibir_pre(arvore);
     }
@@ -712,7 +741,7 @@ int main1()
     //     printf("\nValor a ser removido: ");
     //     scanf("%d", &valor);
     //     while(getchar() != '\n');
-    //     arvore23_remover(&arvore, valor, NULL, &arvore);
+    //     arvore23_remover1(&arvore, valor, NULL, &arvore);
     //     printf("\n\nÁrvore após remover %d:\n", valor);
     //     arvore23_exibir_pre(arvore);
     // }
@@ -726,13 +755,12 @@ int main2()
     int tam, valor = 100;
     int *valores;
 
-    Arvore23 *arvore, *maior;
+    Arvore23 *arvore;
     arvore = arvore23_criar();
     Data promove;
 
     for(int i = 1; i <= 19; i++)
     {
-        maior = NULL;
         printf("\n\n[%dº caso]", i);
 
         valores = caso_selecionado(i, &tam);
@@ -745,7 +773,8 @@ int main2()
         printf("\n\nÁrvore após inserção: \n");
         arvore23_exibir_pre(arvore);
 
-        arvore23_remover(&arvore, valor, NULL, &arvore, &maior);
+        arvore23_remover(&arvore, valor);
+        // arvore23_remover1(&arvore, valor, NULL, &arvore, &maior);
 
         printf("\n\nÁrvore após remover %d:\n", valor);
         arvore23_exibir_pre(arvore);
@@ -758,8 +787,8 @@ int main2()
 
 int main()
 {
-    // main1();
-    main2();
+    main1();
+    // main2();
 
     return 0;
 }
