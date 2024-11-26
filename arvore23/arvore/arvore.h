@@ -28,6 +28,7 @@ Arvore23 *arvore23_inserir(Arvore23 **raiz, Data info, Arvore23 *pai, Data *prom
 
 
 int arvore23_remover1();
+int arvore23_rebalancear(Arvore23 **raiz, Arvore23 **maior);
 
 Arvore23 *arvore23_buscar();
 
