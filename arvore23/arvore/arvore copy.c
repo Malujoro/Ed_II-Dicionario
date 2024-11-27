@@ -17,6 +17,7 @@ int eh_info2(Arvore23 no, int info)
     return no.n_infos == 2 && info == no.info2.numero;
 }
 
+// TODO inutilizada
 void troca_infos(Data *info1, Data *info2)
 {
     Data aux = *info1;
@@ -195,6 +196,7 @@ Arvore23 *buscar_menor_pai(Arvore23 *origem, Arvore23 *pai, int info)
     return pai;
 }
 
+// TODO talvez adicionar ponteiro para função como parâmetro
 int movimento_onda(Data saindo, Data *entrada, Arvore23 *pai, Arvore23 **origem, Arvore23 **raiz, Arvore23 **maior)
 {
     int removeu = arvore23_remover1(raiz, saindo.numero, pai, origem, maior);
@@ -285,6 +287,7 @@ Arvore23 *arvore23_inserir(Arvore23 **raiz, Data info, Arvore23 *pai, Data *prom
     return maior;
 }
 
+// TODO inutilizada
 int possivel_remover(Arvore23 *raiz)
 {
     int possivel = 0;
@@ -345,7 +348,7 @@ int arvore23_remover1(Arvore23 **raiz, int info, Arvore23 *pai, Arvore23 **orige
                         {
                             Data info_pai;
                             pai_aux = buscar_maior_pai(*origem, pai, (*raiz)->info1.numero);
-                            if(pai_aux != NULL)
+                            if(pai_aux != NULL && pai->n_infos == 1)
                             {
                                 if(pai_aux->info1.numero > (*raiz)->info1.numero)
                                     info_pai = pai_aux->info1;
@@ -361,8 +364,6 @@ int arvore23_remover1(Arvore23 **raiz, int info, Arvore23 *pai, Arvore23 **orige
                                 *maior = pai;
                                 (*raiz)->n_infos = 0;
                                 removeu = -1;
-                                // TODO desalocar verificando
-                                // no23_desalocar(raiz);
                             }
                         }
                     }
@@ -464,9 +465,8 @@ int arvore23_remover2(Arvore23 **raiz, int info, Arvore23 *pai, Arvore23 **orige
                         else
                         {
                             Data info_pai;
-                            // TODO Criar função
                             pai_aux = buscar_menor_pai(*origem, pai, (*raiz)->info1.numero);
-                            if(pai_aux != NULL)
+                            if(pai_aux != NULL && pai->n_infos == 1)
                             {
                                 if(pai_aux->n_infos == 2 && pai_aux->info2.numero < (*raiz)->info1.numero)
                                     info_pai = pai_aux->info2;
@@ -479,9 +479,8 @@ int arvore23_remover2(Arvore23 **raiz, int info, Arvore23 *pai, Arvore23 **orige
                             }
                             else
                             {
-                                *maior = pai;
-                                (*raiz)->n_infos = 0;
-                                removeu = -1;
+                                // Revisar
+                                movimento_onda(pai->info1, &((*raiz)->info1), pai_aux, origem, raiz, maior);
                             }
                         }
                     }
@@ -491,8 +490,7 @@ int arvore23_remover2(Arvore23 **raiz, int info, Arvore23 *pai, Arvore23 **orige
             }
             else
             {
-                Arvore23 *filho, *filho2;
-                filho2 = NULL;
+                Arvore23 *filho;
                 Data info_filho;
                 pai_aux = *raiz;
 
@@ -543,35 +541,13 @@ int arvore23_remover2(Arvore23 **raiz, int info, Arvore23 *pai, Arvore23 **orige
     }
 
     // TODO revisar
-    if(*raiz != NULL && !eh_folha(**raiz))
-    {
-        if((*raiz)->n_infos == 1 && ((*raiz)->esquerdo == NULL || (*raiz)->esquerdo->n_infos == 0))
-        {
-            if((*raiz)->esquerdo != NULL)
-                no23_desalocar(&((*raiz)->esquerdo));
-            *maior = no23_juntar((*raiz)->centro, (*raiz)->info1, *maior, raiz);
-        }
-        else if((*raiz)->n_infos == 2 && ((*raiz)->direito == NULL || (*raiz)->direito->n_infos == 0))
-        {
-            if((*raiz)->direito != NULL)
-                no23_desalocar(&((*raiz)->direito));
-            *maior = no23_juntar((*raiz)->centro, (*raiz)->info2, *maior, raiz);
-        }
-    }
-
     if(*origem == NULL)
         *origem = *maior;
 
     return removeu;
 }
 
-// TODO verificar função de balancear
-/* TODO
-    Criar uma função que vai gerenciar a remoção
-    Vai remover normal, retornando um valor indicando se precisa de balanceamento
-    Caso precise de balanceamento e seja possível remover, executa uma "remoção reversa" para ocupar o espaço que tá Nulo (com n_infos = 0) 
-*/
-
+// TODO Revisar
 int arvore23_remover(Arvore23 **raiz, int info)
 {   
     Arvore23 *maior, *posicao_juncao;
@@ -580,9 +556,23 @@ int arvore23_remover(Arvore23 **raiz, int info)
 
     if(removeu == -1)
     {
-        removeu = arvore23_rebalancear(raiz, &maior);
-        // if(removeu == -1)
-        //     removeu = arvore23_remover2(raiz, posicao_juncao, NULL, raiz, &posicao_juncao);
+        Data valor_juncao = maior_info(posicao_juncao);
+        removeu = arvore23_rebalancear(raiz, valor_juncao.numero, &maior);
+        
+        if(removeu == -1)
+        {
+            Arvore23 *pai, *posicao_juncao2;
+            Data *entrada;
+            pai = buscar_pai(*raiz, valor_juncao.numero);
+
+            if(eh_info1(*posicao_juncao, valor_juncao.numero))
+                entrada = &(posicao_juncao->centro->info1);
+            else
+                entrada = &(posicao_juncao->direito->info1);
+
+            removeu = movimento_onda_esq2dir(valor_juncao, entrada, pai, raiz, &posicao_juncao, &posicao_juncao2);
+        }
+            // removeu = arvore23_remover2(raiz, posicao_juncao->info1.numero, NULL, raiz, &posicao_juncao);
 
         if(*raiz == NULL)
             *raiz = maior;
@@ -591,35 +581,45 @@ int arvore23_remover(Arvore23 **raiz, int info)
     return removeu;
 }
 
-int arvore23_rebalancear(Arvore23 **raiz, Arvore23 **maior)
+int arvore23_rebalancear(Arvore23 **raiz, int info, Arvore23 **maior)
 {
     int balanceou = 0;
     if(*raiz != NULL)
     {
         if(!eh_folha(**raiz))
         {
-            if((*raiz)->n_infos == 1)
+            if((*raiz)->n_infos == 2 && !eh_info1(**raiz, info) && !eh_info2(**raiz, info))
+                balanceou = -1;
+            else
             {
-                balanceou = arvore23_rebalancear(&((*raiz)->centro), maior);
-                if((*raiz)->centro == NULL || (*raiz)->centro->n_infos == 0)
+                if(info < (*raiz)->info1.numero)
+                    balanceou = arvore23_rebalancear(&((*raiz)->esquerdo), info, maior);
+                else if((*raiz)->n_infos == 1 || info < (*raiz)->info2.numero)
+                    balanceou = arvore23_rebalancear(&((*raiz)->centro), info, maior);
+                else
+                    balanceou = arvore23_rebalancear(&((*raiz)->direito), info, maior);
+                
+                if((*raiz)->n_infos == 1)
                 {
-                    if((*raiz)->centro != NULL)
-                        no23_desalocar(&((*raiz)->centro));
+                    if((*raiz)->centro == NULL || (*raiz)->centro->n_infos == 0)
+                    {
+                        if((*raiz)->centro != NULL)
+                            no23_desalocar(&((*raiz)->centro));
 
-                    *maior = no23_juntar((*raiz)->esquerdo, (*raiz)->info1, *maior, raiz);
-                    balanceou = 1;
+                        *maior = no23_juntar((*raiz)->esquerdo, (*raiz)->info1, *maior, raiz);
+                        balanceou = 1;
+                    }
                 }
-            }
-            else if((*raiz)->n_infos == 2)
-            {
-                balanceou = arvore23_rebalancear(&((*raiz)->direito), maior);
-                if((*raiz)->direito == NULL || (*raiz)->direito->n_infos == 0)
+                else if((*raiz)->n_infos == 2)
                 {
-                    if((*raiz)->direito != NULL)
-                        no23_desalocar(&((*raiz)->direito));
+                    if((*raiz)->direito == NULL || (*raiz)->direito->n_infos == 0)
+                    {
+                        if((*raiz)->direito != NULL)
+                            no23_desalocar(&((*raiz)->direito));
 
-                    *maior = no23_juntar((*raiz)->centro, (*raiz)->info2, *maior, raiz);
-                    balanceou = 1;
+                        *maior = no23_juntar((*raiz)->centro, (*raiz)->info2, *maior, raiz);
+                        balanceou = 1;
+                    }
                 }
             }
         }
