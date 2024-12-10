@@ -1,8 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "arvore.h"
 
-ArvoreVP *no_alocar()
+ArvoreVP *novp_alocar()
 {
     ArvoreVP *no;
     no = (ArvoreVP *)malloc(sizeof(ArvoreVP));
@@ -16,10 +17,10 @@ ArvoreVP *no_alocar()
     return no;
 }
 
-ArvoreVP *no_criar(Data info)
+ArvoreVP *novp_criar(DataPT info)
 {
     ArvoreVP *no;
-    no = no_alocar();
+    no = novp_alocar();
 
     no->info = info;
     no->cor = VERMELHO;
@@ -112,17 +113,19 @@ void balancear_vp(ArvoreVP **raiz)
     }
 }
 
-int arvorevp_inserir_no(ArvoreVP **raiz, Data info)
+int arvorevp_inserir_no(ArvoreVP **raiz, DataPT info)
 {
     int inseriu = 1;
 
     if ((*raiz) == NULL)
-        (*raiz) = no_criar(info);
+        (*raiz) = novp_criar(info);
     else
     {
-        if (info.numero < (*raiz)->info.numero)
+        int resultado = strcmp(info.palavraPT, (*raiz)->info.palavraPT);
+
+        if (resultado < 0)
             inseriu = arvorevp_inserir_no(&((*raiz)->esquerdo), info);
-        else if (info.numero > (*raiz)->info.numero)
+        else if (resultado > 0)
             inseriu = arvorevp_inserir_no(&((*raiz)->direito), info);
         else
             inseriu = 0;
@@ -133,18 +136,20 @@ int arvorevp_inserir_no(ArvoreVP **raiz, Data info)
     return inseriu;
 }
 
-ArvoreVP *arvorevp_buscar(ArvoreVP *raiz, int valor)
+ArvoreVP *arvorevp_buscar(ArvoreVP *raiz, char *palavra)
 {
     ArvoreVP *retorno;
 
     if(raiz != NULL)
     {
-        if(valor == raiz->info.numero)
+        int resultado = strcmp(palavra, raiz->info.palavraPT);
+
+        if(resultado == 0)
             retorno = raiz;
-        else if(valor < raiz->info.numero)
-            retorno = arvorevp_buscar(raiz->esquerdo, valor);
-        else if(valor > raiz->info.numero)
-            retorno = arvorevp_buscar(raiz->direito, valor);
+        else if(resultado < 0)
+            retorno = arvorevp_buscar(raiz->esquerdo, palavra);
+        else if(resultado > 0)
+            retorno = arvorevp_buscar(raiz->direito, palavra);
     }
     else
         retorno = NULL;
@@ -156,7 +161,7 @@ void arvorevp_exibir_pre(ArvoreVP *raiz)
 {
     if (raiz != NULL)
     {
-        printf("%d | Cor: [%s] \n", raiz->info.numero, retornar_cor(raiz) == PRETO ? "Preto" : "Vermelho");
+        printf("%s | Cor: [%s] \n", raiz->info.palavraPT, retornar_cor(raiz) == PRETO ? "Preto" : "Vermelho");
         arvorevp_exibir_pre(raiz->esquerdo);
         arvorevp_exibir_pre(raiz->direito);
     }
@@ -167,7 +172,7 @@ void arvorevp_exibir_ordem(ArvoreVP *raiz)
     if (raiz != NULL)
     {
         arvorevp_exibir_ordem(raiz->esquerdo);
-        printf("%d | Cor: [%s] \n", raiz->info.numero, retornar_cor(raiz) == PRETO ? "Preto" : "Vermelho");
+        printf("%s | Cor: [%s] \n", raiz->info.palavraPT, retornar_cor(raiz) == PRETO ? "Preto" : "Vermelho");
         arvorevp_exibir_ordem(raiz->direito);
     }
 }
@@ -178,7 +183,7 @@ void arvorevp_exibir_pos(ArvoreVP *raiz)
     {
         arvorevp_exibir_pos(raiz->esquerdo);
         arvorevp_exibir_pos(raiz->direito);
-        printf("%d | Cor: [%s] \n", raiz->info.numero, retornar_cor(raiz) == PRETO ? "Preto" : "Vermelho");
+        printf("%s | Cor: [%s] \n", raiz->info.palavraPT, retornar_cor(raiz) == PRETO ? "Preto" : "Vermelho");
     }
 }
 
@@ -232,13 +237,15 @@ static ArvoreVP *menor_filho(ArvoreVP *raiz)
     return aux;
 }
 
-int arvorevp_remover_no(ArvoreVP **raiz, int valor)
+int arvorevp_remover_no(ArvoreVP **raiz, char *palavra)
 {
     int removeu = 1;
 
     if((*raiz) != NULL)
     {
-        if(valor < (*raiz)->info.numero)
+        int resultado = strcmp(palavra, (*raiz)->info.palavraPT);
+
+        if(resultado < 0)
         {
             if((*raiz)->esquerdo != NULL)
             {
@@ -246,13 +253,13 @@ int arvorevp_remover_no(ArvoreVP **raiz, int valor)
                     mover_esquerda(raiz);
             }
                 
-            removeu = arvorevp_remover_no(&((*raiz)->esquerdo), valor);
+            removeu = arvorevp_remover_no(&((*raiz)->esquerdo), palavra);
         }
         else {
             if(retornar_cor((*raiz)->esquerdo) == VERMELHO)
                 rotacao_direita(raiz);
 
-            if(valor == (*raiz)->info.numero && (*raiz)->direito == NULL)
+            if(resultado == 0 && (*raiz)->direito == NULL)
                 no_desalocar(raiz);
             else
             {
@@ -262,7 +269,7 @@ int arvorevp_remover_no(ArvoreVP **raiz, int valor)
                         mover_direita(raiz);
                 }
 
-                if(valor == (*raiz)->info.numero)
+                if(resultado == 0)
                 {
                     ArvoreVP *menor;
                     menor = menor_filho((*raiz)->direito);
@@ -271,7 +278,7 @@ int arvorevp_remover_no(ArvoreVP **raiz, int valor)
                     printf("\n");
                 }
                 else
-                    removeu = arvorevp_remover_no(&((*raiz)->direito), valor);
+                    removeu = arvorevp_remover_no(&((*raiz)->direito), palavra);
             }
         }
         balancear_vp(raiz);
@@ -282,7 +289,7 @@ int arvorevp_remover_no(ArvoreVP **raiz, int valor)
     return removeu;
 }
 
-int arvorevp_inserir(ArvoreVP **raiz, Data info)
+int arvorevp_inserir(ArvoreVP **raiz, DataPT info)
 {
     int inseriu = arvorevp_inserir_no(raiz, info);
 
@@ -292,9 +299,9 @@ int arvorevp_inserir(ArvoreVP **raiz, Data info)
     return inseriu;
 }
 
-int arvorevp_remover(ArvoreVP **raiz, int valor)
+int arvorevp_remover(ArvoreVP **raiz, char *palavra)
 {
-    int removeu = arvorevp_remover_no(raiz, valor);
+    int removeu = arvorevp_remover_no(raiz, palavra);
     
     if(*raiz != NULL)
         (*raiz)->cor = PRETO;
@@ -302,37 +309,38 @@ int arvorevp_remover(ArvoreVP **raiz, int valor)
     return removeu;
 }
 
-int main()
-{
-    int tam, tam_remov;
+// int main()
+// {
+//     int tam, tam_remov;
 
-    // int valores[] = {1000, 1500, 500, 2000, 2500, 750, 600, 400, 300, 550, 800};
-    int valores[] = {1000, 4000, 3000, 2000, 500, 4500, 3500};
-    int removidos[] = {3500, 2000, 3000, 4};
+//     // int valores[] = {1000, 1500, 500, 2000, 2500, 750, 600, 400, 300, 550, 800};
+//     // char *valores[] = {1000, 4000, 3000, 2000, 500, 4500, 3500};
+//     char *valores[] = { "b",  "f",  "d",  "c", "a",  "g",  "e"};
+//     char *removidos[] = {"e", "c", "d", "4"};
 
-    tam = sizeof(valores) / sizeof(int);
-    tam_remov = sizeof(removidos) / sizeof(int);
+//     tam = sizeof(valores) / sizeof(char *);
+//     tam_remov = sizeof(removidos) / sizeof(char *);
 
-    ArvoreVP *arvore;
-    arvore = arvorevp_criar();
+//     ArvoreVP *arvore;
+//     arvore = arvorevp_criar();
 
-    for(int i = 0; i < tam; i++)
-    {
-        Data info;
-        info.numero = valores[i];
+//     for(int i = 0; i < tam; i++)
+//     {
+//         DataPT info;
+//         info.palavraPT = valores[i];
         
-        arvorevp_inserir(&arvore, info);
-    }
-    printf("\n\nÁrvore após inserção: \n");
-    arvorevp_exibir_pre(arvore);
+//         arvorevp_inserir(&arvore, info);
+//     }
+//     printf("\n\nÁrvore após inserção: \n");
+//     arvorevp_exibir_pre(arvore);
 
-    for(int i = 0; i < tam_remov; i++)
-    {
-        arvorevp_remover(&arvore, removidos[i]);
-        printf("\n\nÁrvore após remover %d:\n", removidos[i]);
-        arvorevp_exibir_pre(arvore);
-    }
+//     for(int i = 0; i < tam_remov; i++)
+//     {
+//         arvorevp_remover(&arvore, removidos[i]);
+//         printf("\n\nÁrvore após remover %s:\n", removidos[i]);
+//         arvorevp_exibir_pre(arvore);
+//     }
 
-    printf("\n\n");
-    return 0;
-}
+//     printf("\n\n");
+//     return 0;
+// }

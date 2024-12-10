@@ -17,14 +17,14 @@ typedef struct arvorebb
     Função para alocar um nó da árvore
     Retorna o endereço do nó alocado
 */
-ArvoreBB *no_alocar();
+ArvoreBB *nobb_alocar();
 
 /*
     Função para criar o nó da árvore
     Tem como parâmetro a informação do nó 
     Retorna o endereço do nó criado
 */
-ArvoreBB *no_criar(DataEng info);
+ArvoreBB *nobb_criar(DataEng info);
 
 /*
     Função para criar a árvore

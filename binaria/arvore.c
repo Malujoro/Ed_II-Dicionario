@@ -3,7 +3,7 @@
 #include <string.h>
 #include "arvore.h"
 
-ArvoreBB *no_alocar()
+ArvoreBB *nobb_alocar()
 {
     ArvoreBB *no;
     no = (ArvoreBB *)malloc(sizeof(ArvoreBB));
@@ -17,10 +17,10 @@ ArvoreBB *no_alocar()
     return no;
 }
 
-ArvoreBB *no_criar(DataEng info)
+ArvoreBB *nobb_criar(DataEng info)
 {
     ArvoreBB *no;
-    no = no_alocar();
+    no = nobb_alocar();
 
     no->info = info;
     no->esquerdo = NULL;
@@ -52,7 +52,7 @@ int arvorebb_inserir(ArvoreBB **raiz, DataEng info)
 {
     int inseriu = 1;
     if ((*raiz) == NULL)
-        (*raiz) = no_criar(info);
+        (*raiz) = nobb_criar(info);
     else
     {
         int resultado = strcmp(info.palavraIngles, (*raiz)->info.palavraIngles);
@@ -99,6 +99,25 @@ void arvorebb_exibir_pre(ArvoreBB *raiz)
     }
 }
 
+void arvorebb_exibir_ordem(ArvoreBB *raiz)
+{
+    if (raiz != NULL)
+    {
+        arvorebb_exibir_ordem(raiz->esquerdo);
+        printf("[%d] %s | ", raiz->info.unidade, raiz->info.palavraIngles);
+        arvorebb_exibir_ordem(raiz->direito);
+    }
+}
+
+void arvorebb_exibir_pos(ArvoreBB *raiz)
+{
+    if (raiz != NULL)
+    {
+        arvorebb_exibir_pos(raiz->esquerdo);
+        arvorebb_exibir_pos(raiz->direito);
+        printf("[%d] %s | ", raiz->info.unidade, raiz->info.palavraIngles);
+    }
+}
 
 static int no_folha(ArvoreBB *raiz)
 {
@@ -171,37 +190,37 @@ int arvorebb_remover(ArvoreBB **raiz, char *palavra)
     return removeu;
 }
 
-// int main()
-// {
-//     int tam, tam_remov;
+int main()
+{
+    int tam, tam_remov;
 
-//     char *valores[] = {"banana", "ajuda", "abacate", "maca", "melao", "arroz", "maao"};
-//     char *removidos[] = {"arroz", "ajuda"};
+    char *valores[] = {"banana", "ajuda", "abacate", "maca", "melao", "arroz", "maao"};
+    char *removidos[] = {"arroz", "ajuda"};
 
-//     tam = sizeof(valores) / sizeof(char *);
-//     tam_remov = sizeof(removidos) / sizeof(char *);
+    tam = sizeof(valores) / sizeof(char *);
+    tam_remov = sizeof(removidos) / sizeof(char *);
 
-//     ArvoreBB *arvore;
-//     arvore = arvorebb_criar();
+    ArvoreBB *arvore;
+    arvore = arvorebb_criar();
 
-//     for(int i = 0; i < tam; i++)
-//     {
-//         DataEng info;
-//         info.palavraIngles = valores[i];
-//         info.unidade = i % 2;
+    for(int i = 0; i < tam; i++)
+    {
+        DataEng info;
+        info.palavraIngles = valores[i];
+        info.unidade = i % 2;
 
-//         arvorebb_inserir(&arvore, info);
-//     }
-//     printf("\n\nÁrvore após inserção: \n");
-//     arvorebb_exibir_pre(arvore);
+        arvorebb_inserir(&arvore, info);
+    }
+    printf("\n\nÁrvore após inserção: \n");
+    arvorebb_exibir_pre(arvore);
 
-//     for(int i = 0; i < tam_remov; i++)
-//     {
-//         arvorebb_remover(&arvore, removidos[i]);
-//         printf("\n\nÁrvore após remover %s:\n", removidos[i]);
-//         arvorebb_exibir_pre(arvore);
-//     }
+    for(int i = 0; i < tam_remov; i++)
+    {
+        arvorebb_remover(&arvore, removidos[i]);
+        printf("\n\nÁrvore após remover %s:\n", removidos[i]);
+        arvorebb_exibir_pre(arvore);
+    }
 
-//     printf("\n\n");
-//     return 0;
-// }
+    printf("\n\n");
+    return 0;
+}
