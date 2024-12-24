@@ -33,7 +33,9 @@ int arvore23_rebalancear(Arvore23 **raiz, int info, Arvore23 **maior);
 
 Arvore23 *arvore23_buscar();
 
-void arvore23_exibir();
+void arvore23_exibir_pre(Arvore23 *raiz);
+void arvore23_exibir_ordem(Arvore23 *raiz);
+void arvore23_exibir_pos(Arvore23 *raiz);
 
 void no23_adicionar_info(Arvore23 *no, Data info, Arvore23 *filho_maior);
 Arvore23 *buscar_menor_filho(Arvore23 *raiz, Arvore23 **pai);

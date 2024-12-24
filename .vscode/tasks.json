@@ -10,7 +10,7 @@
                 "${file}",
                 "-o",
                 "${fileDirname}/${fileBasenameNoExtension}",
-                "${fileDirname}/../../binaria/arvore.c",
+                // "${fileDirname}/../../binaria/arvore.c",
                 // "${fileDirname}/lista_alunos/lista.c",
                 // "${fileDirname}/../extras/extras.c",
                 // "${fileDirname}/cadastro/cadastro.c",
