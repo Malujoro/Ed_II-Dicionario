@@ -335,13 +335,36 @@ Arvore23 *arvore23_inserir(Arvore23 **raiz, Data info, Arvore23 *pai, Data *prom
     return maior;
 }
 
+int arvore23_remover_nao_folha(Arvore23 **origem, Arvore23* raiz, Data *info, Arvore23 *filho1, Arvore23 *filho2, Arvore23 **maior)
+{
+    int removeu;
+    Arvore23 *filho, *pai;
+
+    pai = raiz;
+    Data info_filho;
+
+    filho = buscar_maior_filho(filho1, &pai, &info_filho);
+
+    if(filho->n_infos == 2)
+    {
+        *info = info_filho;
+        filho->n_infos = 1;
+    }
+    else
+    {
+        filho = buscar_menor_filho(filho2, &pai);
+        removeu = movimento_onda(filho->info1, info, pai, origem, &filho, maior);
+    }
+
+    return removeu;
+}
+
 int arvore23_remover1(Arvore23 **raiz, int info, Arvore23 *pai, Arvore23 **origem, Arvore23 **maior)
 {
     int removeu = 0;
 
     if(*raiz != NULL)
     {
-        Arvore23 *pai_aux;
         int info1 = eh_info1(**raiz, info);
         int info2 = eh_info2(**raiz, info);
 
@@ -363,19 +386,21 @@ int arvore23_remover1(Arvore23 **raiz, int info, Arvore23 *pai, Arvore23 **orige
                         no23_desalocar(raiz);
                     else
                     {
-                        
+                        Arvore23 *pai_aux;
+                        Data info_pai;
                         if(*raiz == pai->esquerdo || (pai->n_infos == 2 && *raiz == pai->centro))
                         {
                             pai_aux = buscar_pai(*origem, pai->info1.numero);
                             
                             if(*raiz == pai->esquerdo)
-                                removeu = movimento_onda(pai->info1, &((*raiz)->info1), pai_aux, origem, &pai, maior);
+                                info_pai = pai->info1;
                             else 
-                                removeu = movimento_onda(pai->info2, &((*raiz)->info1), pai_aux, origem, &pai, maior);
+                                info_pai = pai->info2;
+
+                            removeu = movimento_onda(info_pai, &((*raiz)->info1), pai_aux, origem, &pai, maior);
                         }
                         else // Filho do centro (com pai de 1 info) ou da direita
                         {
-                            Data info_pai;
                             pai_aux = buscar_maior_pai(*origem, (*raiz)->info1.numero);
 
                             Arvore23 *menor_pai;
@@ -402,47 +427,10 @@ int arvore23_remover1(Arvore23 **raiz, int info, Arvore23 *pai, Arvore23 **orige
                     }
                 }
             }
-            else
-            {
-                Arvore23 *filho, *filho2;
-                filho2 = NULL;
-                Data info_filho;
-                pai_aux = *raiz;
-
-                if(info2)
-                {
-                    Arvore23 *pai_aux2;
-                    pai_aux2 = *raiz;
-
-                    filho = buscar_menor_filho((*raiz)->direito, &pai_aux);
-
-                    if(filho->n_infos == 1)
-                        filho2 = buscar_maior_filho((*raiz)->centro, &pai_aux2, &info_filho);
-                    
-                    if(filho2 != NULL && filho2->n_infos == 2)
-                    {
-                        (*raiz)->info2 = filho2->info2;
-                        filho2->n_infos = 1;
-                    }
-                    else
-                        removeu = movimento_onda(filho->info1, &((*raiz)->info2), pai_aux, origem, &filho, maior);
-                }
-                else if(info1)
-                {
-                    filho2 = buscar_maior_filho((*raiz)->esquerdo, &pai_aux, &info_filho);
-
-                    if(filho2->n_infos == 2)
-                    {
-                        (*raiz)->info1 = info_filho;
-                        filho2->n_infos = 1;
-                    }
-                    else
-                    {
-                        filho = buscar_menor_filho((*raiz)->centro, &pai_aux);
-                        removeu = movimento_onda(filho->info1, &((*raiz)->info1), pai_aux, origem, &filho, maior);
-                    }
-                }
-            }
+            else if(info2)
+                removeu = arvore23_remover_nao_folha(origem, *raiz, &((*raiz)->info2), (*raiz)->centro, (*raiz)->direito, maior);
+            else if(info1)
+                removeu = arvore23_remover_nao_folha(origem, *raiz, &((*raiz)->info1), (*raiz)->esquerdo, (*raiz)->centro, maior);
         }
         else
         {
@@ -964,7 +952,7 @@ int main2()
 int main()
 {
     main1();
-    // main2();
+    main2();
 
     return 0;
 }
