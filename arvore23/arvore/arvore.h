@@ -38,8 +38,6 @@ void arvore23_exibir_ordem(Arvore23 *raiz);
 void arvore23_exibir_pos(Arvore23 *raiz);
 
 void no23_adicionar_info(Arvore23 *no, Data info, Arvore23 *filho_maior);
-Arvore23 *buscar_menor_filho(Arvore23 *raiz, Arvore23 **pai);
-int movimento_onda(Data saindo, Data *entrada, Arvore23 *pai, Arvore23 **origem, Arvore23 **raiz, Arvore23 **maior, int (*funcao_remover)(Arvore23 **, int, Arvore23 *, Arvore23 **, Arvore23 **));
 
 
 #endif
