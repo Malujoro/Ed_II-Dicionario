@@ -49,7 +49,7 @@ void arvorevp_desalocar(ArvoreVP **raiz);
     Tem como parâmetro a referência da raiz da árvore e a informação a ser adicionada
     Retorna 1 caso a adição tenha sido feita com sucesso, e 0 caso o código já exista na árvore
 */
-int arvorevp_inserir(ArvoreVP **raiz, DataPT info);
+ArvoreVP *arvorevp_inserir(ArvoreVP **raiz, DataPT info);
 
 /*
     Função para buscar um nó da árvore

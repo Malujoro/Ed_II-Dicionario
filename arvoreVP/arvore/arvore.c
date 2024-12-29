@@ -113,12 +113,16 @@ void balancear_vp(ArvoreVP **raiz)
     }
 }
 
-int arvorevp_inserir_no(ArvoreVP **raiz, DataPT info)
+ArvoreVP *arvorevp_inserir_no(ArvoreVP **raiz, DataPT info)
 {
-    int inseriu = 1;
+    ArvoreVP *inseriu;
+    inseriu = NULL;
 
     if ((*raiz) == NULL)
+    {
         (*raiz) = novp_criar(info);
+        inseriu = *raiz;
+    }
     else
     {
         int resultado = strcmp(info.palavraPT, (*raiz)->info.palavraPT);
@@ -128,7 +132,7 @@ int arvorevp_inserir_no(ArvoreVP **raiz, DataPT info)
         else if (resultado > 0)
             inseriu = arvorevp_inserir_no(&((*raiz)->direito), info);
         else
-            inseriu = 0;
+            inseriu = *raiz;
 
         balancear_vp(raiz);
     }
@@ -289,9 +293,9 @@ int arvorevp_remover_no(ArvoreVP **raiz, char *palavra)
     return removeu;
 }
 
-int arvorevp_inserir(ArvoreVP **raiz, DataPT info)
+ArvoreVP *arvorevp_inserir(ArvoreVP **raiz, DataPT info)
 {
-    int inseriu = arvorevp_inserir_no(raiz, info);
+    ArvoreVP *inseriu = arvorevp_inserir_no(raiz, info);
 
     if(*raiz != NULL)
         (*raiz)->cor = PRETO;

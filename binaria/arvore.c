@@ -48,11 +48,16 @@ void arvorebb_desalocar(ArvoreBB **raiz)
     }
 }
 
-int arvorebb_inserir(ArvoreBB **raiz, DataEng info)
+ArvoreBB *arvorebb_inserir(ArvoreBB **raiz, DataEng info)
 {
-    int inseriu = 1;
+    ArvoreBB *inseriu;
+    inseriu = NULL;
+
     if ((*raiz) == NULL)
+    {
         (*raiz) = nobb_criar(info);
+        inseriu = *raiz;
+    }
     else
     {
         int resultado = strcmp(info.palavraIngles, (*raiz)->info.palavraIngles);
@@ -62,7 +67,7 @@ int arvorebb_inserir(ArvoreBB **raiz, DataEng info)
         else if (resultado > 0)
             inseriu = arvorebb_inserir(&((*raiz)->direito), info);
         else
-            inseriu = 0;
+            inseriu = *raiz;
     }
 
     return inseriu;
@@ -89,11 +94,19 @@ ArvoreBB *arvorebb_buscar(ArvoreBB *raiz, char *palavra)
     return retorno;
 }
 
+void exibir_dataEng(DataEng info)
+{
+    printf("Palavra: %s |", info.palavraIngles);
+    printf("Unidades: ");
+    lista_exibir(info.unidade);
+
+}
+
 void arvorebb_exibir_pre(ArvoreBB *raiz)
 {
     if (raiz != NULL)
     {
-        printf("[%d] %s | ", raiz->info.unidade, raiz->info.palavraIngles);
+        exibir_dataEng(raiz->info);
         arvorebb_exibir_pre(raiz->esquerdo);
         arvorebb_exibir_pre(raiz->direito);
     }
@@ -104,7 +117,7 @@ void arvorebb_exibir_ordem(ArvoreBB *raiz)
     if (raiz != NULL)
     {
         arvorebb_exibir_ordem(raiz->esquerdo);
-        printf("[%d] %s | ", raiz->info.unidade, raiz->info.palavraIngles);
+        exibir_dataEng(raiz->info);
         arvorebb_exibir_ordem(raiz->direito);
     }
 }
@@ -115,7 +128,7 @@ void arvorebb_exibir_pos(ArvoreBB *raiz)
     {
         arvorebb_exibir_pos(raiz->esquerdo);
         arvorebb_exibir_pos(raiz->direito);
-        printf("[%d] %s | ", raiz->info.unidade, raiz->info.palavraIngles);
+        exibir_dataEng(raiz->info);
     }
 }
 
@@ -190,37 +203,37 @@ int arvorebb_remover(ArvoreBB **raiz, char *palavra)
     return removeu;
 }
 
-int main()
-{
-    int tam, tam_remov;
+// int main()
+// {
+//     int tam, tam_remov;
 
-    char *valores[] = {"banana", "ajuda", "abacate", "maca", "melao", "arroz", "maao"};
-    char *removidos[] = {"arroz", "ajuda"};
+//     char *valores[] = {"banana", "ajuda", "abacate", "maca", "melao", "arroz", "maao"};
+//     char *removidos[] = {"arroz", "ajuda"};
 
-    tam = sizeof(valores) / sizeof(char *);
-    tam_remov = sizeof(removidos) / sizeof(char *);
+//     tam = sizeof(valores) / sizeof(char *);
+//     tam_remov = sizeof(removidos) / sizeof(char *);
 
-    ArvoreBB *arvore;
-    arvore = arvorebb_criar();
+//     ArvoreBB *arvore;
+//     arvore = arvorebb_criar();
 
-    for(int i = 0; i < tam; i++)
-    {
-        DataEng info;
-        info.palavraIngles = valores[i];
-        info.unidade = i % 2;
+//     for(int i = 0; i < tam; i++)
+//     {
+//         DataEng info;
+//         info.palavraIngles = valores[i];
+//         info.unidade = i % 2;
 
-        arvorebb_inserir(&arvore, info);
-    }
-    printf("\n\nÁrvore após inserção: \n");
-    arvorebb_exibir_pre(arvore);
+//         arvorebb_inserir(&arvore, info);
+//     }
+//     printf("\n\nÁrvore após inserção: \n");
+//     arvorebb_exibir_pre(arvore);
 
-    for(int i = 0; i < tam_remov; i++)
-    {
-        arvorebb_remover(&arvore, removidos[i]);
-        printf("\n\nÁrvore após remover %s:\n", removidos[i]);
-        arvorebb_exibir_pre(arvore);
-    }
+//     for(int i = 0; i < tam_remov; i++)
+//     {
+//         arvorebb_remover(&arvore, removidos[i]);
+//         printf("\n\nÁrvore após remover %s:\n", removidos[i]);
+//         arvorebb_exibir_pre(arvore);
+//     }
 
-    printf("\n\n");
-    return 0;
-}
+//     printf("\n\n");
+//     return 0;
+// }

@@ -1,9 +1,11 @@
 #ifndef ARVOREBB_H
 #define ARVOREBB_H
 
+#include "../lista/lista.h"
+
 typedef struct dataeng {
     char *palavraIngles;
-    int unidade;
+    Lista *unidade;
 } DataEng;
 
 typedef struct arvorebb
@@ -43,7 +45,7 @@ void arvorebb_desalocar(ArvoreBB **raiz);
     Tem como parâmetro a referência da raiz da árvore e a informação a ser adicionada
     Retorna 1 caso a adição tenha sido feita com sucesso, e 0 caso o código já exista na árvore
 */
-int arvorebb_inserir(ArvoreBB **raiz, DataEng info);
+ArvoreBB *arvorebb_inserir(ArvoreBB **raiz, DataEng info);
 
 /*
     Função para buscar um nó da árvore
