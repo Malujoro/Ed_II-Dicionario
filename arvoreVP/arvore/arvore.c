@@ -161,11 +161,19 @@ ArvoreVP *arvorevp_buscar(ArvoreVP *raiz, char *palavra)
     return retorno;
 }
 
+void exibir_dataPT(DataPT info)
+{
+    printf("Palavra[PT]: %s\n", info.palavraPT);
+    arvorebb_exibir_pre(info.palavrasEng);
+    printf("\n");
+}
+
 void arvorevp_exibir_pre(ArvoreVP *raiz)
 {
     if (raiz != NULL)
     {
-        printf("%s | Cor: [%s] \n", raiz->info.palavraPT, retornar_cor(raiz) == PRETO ? "Preto" : "Vermelho");
+        printf("Cor: [%s] \n", retornar_cor(raiz) == PRETO ? "Preto" : "Vermelho");
+        exibir_dataPT(raiz->info);
         arvorevp_exibir_pre(raiz->esquerdo);
         arvorevp_exibir_pre(raiz->direito);
     }
@@ -176,7 +184,8 @@ void arvorevp_exibir_ordem(ArvoreVP *raiz)
     if (raiz != NULL)
     {
         arvorevp_exibir_ordem(raiz->esquerdo);
-        printf("%s | Cor: [%s] \n", raiz->info.palavraPT, retornar_cor(raiz) == PRETO ? "Preto" : "Vermelho");
+        printf("Cor: [%s] \n", retornar_cor(raiz) == PRETO ? "Preto" : "Vermelho");
+        exibir_dataPT(raiz->info);
         arvorevp_exibir_ordem(raiz->direito);
     }
 }
@@ -187,7 +196,8 @@ void arvorevp_exibir_pos(ArvoreVP *raiz)
     {
         arvorevp_exibir_pos(raiz->esquerdo);
         arvorevp_exibir_pos(raiz->direito);
-        printf("%s | Cor: [%s] \n", raiz->info.palavraPT, retornar_cor(raiz) == PRETO ? "Preto" : "Vermelho");
+        printf("Cor: [%s] \n", retornar_cor(raiz) == PRETO ? "Preto" : "Vermelho");
+        exibir_dataPT(raiz->info);
     }
 }
 

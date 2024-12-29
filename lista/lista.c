@@ -53,8 +53,6 @@ void lista_inserir(Lista **lista, int info)
 
 void lista_exibir(Lista *lista)
 {
-    printf("Lista\n");
-
     Lista *no;
     no = lista;
     while(no != NULL)

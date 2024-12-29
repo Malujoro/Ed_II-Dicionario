@@ -96,10 +96,10 @@ ArvoreBB *arvorebb_buscar(ArvoreBB *raiz, char *palavra)
 
 void exibir_dataEng(DataEng info)
 {
-    printf("Palavra: %s |", info.palavraIngles);
+    printf("Palavra[Eng]: %s | ", info.palavraIngles);
     printf("Unidades: ");
     lista_exibir(info.unidade);
-
+    printf("\n");
 }
 
 void arvorebb_exibir_pre(ArvoreBB *raiz)
