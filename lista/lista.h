@@ -21,4 +21,6 @@ void lista_exibir(Lista *lista);
 
 Lista *lista_buscar(Lista *lista, int info);
 
+int lista_remover(Lista **lista, int info);
+
 #endif

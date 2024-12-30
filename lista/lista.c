@@ -64,10 +64,33 @@ void lista_exibir(Lista *lista)
  
 Lista *lista_buscar(Lista *lista, int info)
 {
-    Lista *aux = lista;
+    Lista *aux;
+    aux = lista;
     
     while(aux != NULL && aux->info != info)
         aux = aux->proximo;
 
     return aux;
+}
+
+int lista_remover(Lista **lista, int info)
+{
+    int removeu = 1;
+
+    if(*lista != NULL)
+    {
+        if((*lista)->info == info)
+        {
+            Lista *aux;
+            aux = (*lista)->proximo;
+            free(*lista);
+            *lista = aux;
+        }
+        else
+            removeu = lista_remover(&((*lista)->proximo), info);
+    }
+    else
+        removeu = 0;
+    
+    return removeu;
 }
