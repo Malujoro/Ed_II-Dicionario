@@ -191,30 +191,6 @@ static Arvore23 *arvore23_buscar_maior_pai(Arvore23 *raiz, int info)
     return pai;
 }
 
-static Arvore23 *arvore23_buscar_maior_pai_2_infos(Arvore23 *raiz, int info)
-{
-    Arvore23 *pai;
-    pai = NULL;
-
-    if(raiz != NULL)
-    {
-        if(!eh_info1(*raiz, info) && !eh_info2(*raiz, info))
-        {
-            if(info < raiz->info1.numero)
-                pai = arvore23_buscar_maior_pai_2_infos(raiz->esquerdo, info);
-            else if(raiz->n_infos == 1 || info < raiz->info2.numero)
-                pai = arvore23_buscar_maior_pai_2_infos(raiz->centro, info);
-            else
-                pai = arvore23_buscar_maior_pai_2_infos(raiz->direito, info);
-
-            if(pai == NULL && raiz->n_infos == 2 && raiz->info1.numero > info)
-                pai = raiz;
-        }
-    }
-
-    return pai;
-}
-
 static Arvore23 *arvore23_buscar_menor_pai(Arvore23 *raiz, int info)
 {
     Arvore23 *pai;
@@ -593,11 +569,12 @@ int arvore23_remover(Arvore23 **raiz, int info)
 
     if(removeu == -1)
     {
+        removeu = 1;
         Data valor_juncao = no23_maior_info(posicao_juncao);
         maior = NULL;
-        removeu = arvore23_rebalancear(raiz, valor_juncao.numero, &maior);
+        int removeu_aux = arvore23_rebalancear(raiz, valor_juncao.numero, &maior);
         
-        if(removeu == -1)
+        if(removeu_aux == -1)
         {
             Arvore23 *pai, *posicao_juncao2;
             Data *entrada;
@@ -608,17 +585,17 @@ int arvore23_remover(Arvore23 **raiz, int info)
             else
                 entrada = &(posicao_juncao->direito->info1);
 
-            removeu = movimento_onda(valor_juncao, entrada, pai, raiz, &posicao_juncao, &posicao_juncao2, arvore23_remover2);
+            removeu_aux = movimento_onda(valor_juncao, entrada, pai, raiz, &posicao_juncao, &posicao_juncao2, arvore23_remover2);
 
-            if(removeu == -1)
+            if(removeu_aux == -1)
             {
                 valor_juncao = posicao_juncao2->info1;
                 pai = arvore23_buscar_pai(*raiz, valor_juncao.numero);
-                removeu = movimento_onda(valor_juncao, &(posicao_juncao2->esquerdo->info1), pai, raiz, &posicao_juncao2, &posicao_juncao, arvore23_remover1);
+                removeu_aux = movimento_onda(valor_juncao, &(posicao_juncao2->esquerdo->info1), pai, raiz, &posicao_juncao2, &posicao_juncao, arvore23_remover1);
 
                 valor_juncao = no23_maior_info(posicao_juncao);
                 maior = NULL;
-                removeu = arvore23_rebalancear(raiz, valor_juncao.numero, &maior);
+                removeu_aux = arvore23_rebalancear(raiz, valor_juncao.numero, &maior);
             }
         }
 
@@ -994,10 +971,10 @@ int main2()
     return 0;
 }
 
-// int main()
-// {
-//     main1();
-//     main2();
+int main()
+{
+    main1();
+    main2();
 
-//     return 0;
-// }
+    return 0;
+}
