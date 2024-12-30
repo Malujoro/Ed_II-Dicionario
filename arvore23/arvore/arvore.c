@@ -17,6 +17,16 @@ static int eh_info2(Arvore23 no, int info)
     return no.n_infos == 2 && info == no.info2.numero;
 }
 
+static int calcular_altura(Arvore23 *no)
+{
+    int altura = -1;
+
+    if(no != NULL)
+        altura = 1 + calcular_altura(no->esquerdo);
+
+    return altura;
+}
+
 Arvore23 *no23_alocar()
 {
     Arvore23 *no;
@@ -438,7 +448,19 @@ int arvore23_remover1(Arvore23 **raiz, int info, Arvore23 *pai, Arvore23 **orige
                             Arvore23 *menor_pai;
                             menor_pai = arvore23_buscar_menor_pai_2_infos(*origem, (*raiz)->info1.numero);
 
-                            if(pai_aux == NULL || (pai_aux != pai && menor_pai != NULL))
+
+                            if(pai_aux != NULL)
+                            {
+                                if(pai_aux->info1.numero > (*raiz)->info1.numero)
+                                    info_pai = pai_aux->info1;
+                                else
+                                    info_pai = pai_aux->info2;
+                            }
+
+                            int altura_menor_pai = calcular_altura(menor_pai);
+                            int altura_pai_aux = calcular_altura(pai_aux);
+
+                            if(pai_aux == NULL || (pai_aux != pai && menor_pai != NULL && altura_menor_pai <= altura_pai_aux && info_pai.numero > menor_pai->info2.numero))
                             {
                                 *maior = pai;
                                 (*raiz)->n_infos = 0;
@@ -446,10 +468,6 @@ int arvore23_remover1(Arvore23 **raiz, int info, Arvore23 *pai, Arvore23 **orige
                             }
                             else
                             {
-                                if(pai_aux->info1.numero > (*raiz)->info1.numero)
-                                    info_pai = pai_aux->info1;
-                                else
-                                    info_pai = pai_aux->info2;
 
                                 Arvore23 *avo;
                                 avo = arvore23_buscar_pai(*origem, info_pai.numero);
@@ -865,7 +883,8 @@ int main1()
     int tam;
 
     // int valores[] = {5000, 4000, 1000, 2000, 1500, 500, 300, 6000, 8000, 7000};
-    int valores[] = {8000, 10000, 15000, 1000, 3000, 7000, 5800, 4200, 2500, 1800, 9000, 7500, 6500, 4300, 3500, 9500, 2100, 500, 900, 100, 600, 1700, 2400, 1250, 1750, 250};
+    // int valores[] = {8000, 10000, 15000, 1000, 3000, 7000, 5800, 4200, 2500, 1800, 9000, 7500, 6500, 4300, 3500, 9500, 2100, 500, 900, 100, 600, 1700, 2400, 1250, 1750, 250};
+    int valores[] = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'x', 'w', 'y', 'z'};
     // int valores[] = {30, 120, 100, 50, 170, 150, 140, 200};
     // int valores[] = {2, 4, 7, 3, 1, 6, 5};
     tam = sizeof(valores) / sizeof(int);
@@ -960,7 +979,6 @@ int main2()
         arvore23_exibir_pre(arvore);
 
         arvore23_remover(&arvore, valor);
-        // arvore23_remover1(&arvore, valor, NULL, &arvore, &maior);
 
         printf("\n\nÁrvore após remover %d:\n", valor);
         arvore23_exibir_pre(arvore);
@@ -971,10 +989,10 @@ int main2()
     return 0;
 }
 
-int main()
-{
-    main1();
-    main2();
+// int main()
+// {
+//     main1();
+//     main2();
 
-    return 0;
-}
+//     return 0;
+// }
