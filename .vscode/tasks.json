@@ -14,11 +14,6 @@
                 "${fileDirname}/arquivo/arquivo.c",
                 "${fileDirname}/../binaria/arvore.c",
                 "${fileDirname}/../lista/lista.c",
-                // "${fileDirname}/../extras/extras.c",
-                // "${fileDirname}/cadastro/cadastro.c",
-                // "${fileDirname}/exibir/exibir.c",
-                // "${fileDirname}/remover/remover.c",
-                // "${fileDirname}/menu/menu.c",
             ],
             "options": {
                 "cwd": "${fileDirname}"

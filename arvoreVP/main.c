@@ -9,42 +9,92 @@
 // (ii)informar uma palavra em português e então imprima todas as palavras em inglês equivalente a palavra em português dada, independente da unidade;
 // void exibir_traducao_em_ingles()
 
-// (iii)informar uma palavra em inglês e e a unidade a qual a mesma pertence remove-la das árvores binárias das quais ela pertence. Caso ela seja a única palavra em uma das árvores binárias, remover também da árvore 2-3;
-int remover_ingles_unidade(ArvoreVP **arvore, char *palavra_ingles, int unidade)
+int remover_ingles_unidade_aux(ArvoreVP **arvore, char *palavra_ingles, int unidade, char ***palavras_removidas, int *quant_removidas)
 {
-    // TODO Dado uma palavra em inglês e uma unidade, remover todas as palavras inglesas daquela unidade (em toda a árvore português). Caso a árvore inglês fique nula, remover aquela palavra português também
-    // Criar uma auxiliar pra fazer essas remoções, e uma outra auxiliar pra verificar em toda a árvore português se há alguma palavra sem tradução pra inglẽs e então removê-la
     int removeu = 0;
     ArvoreBB *no;
     
     if(*arvore != NULL)
     {
-        removeu = remover_ingles_unidade(&((*arvore)->esquerdo), palavra_ingles, unidade) || removeu;
-        removeu = remover_ingles_unidade(&((*arvore)->direito), palavra_ingles, unidade) || removeu;
-
+        removeu = remover_ingles_unidade_aux(&((*arvore)->esquerdo), palavra_ingles, unidade, palavras_removidas, quant_removidas) || removeu;
+        removeu = remover_ingles_unidade_aux(&((*arvore)->direito), palavra_ingles, unidade, palavras_removidas, quant_removidas) || removeu;
+        
         no = arvorebb_buscar((*arvore)->info.palavrasEng, palavra_ingles);
 
         if(no != NULL)
         {
-            removeu = lista_remover(&(no->info.unidade), unidade) || removeu;
-            if(removeu && no->info.unidade == NULL)
+            int removeu_unidade = lista_remover(&(no->info.unidade), unidade);
+            removeu = removeu || removeu_unidade;
+            
+            if(removeu_unidade && no->info.unidade == NULL)
                 arvorebb_remover((&(*arvore)->info.palavrasEng), palavra_ingles);
         }
 
+        if((*arvore)->info.palavrasEng == NULL)
+        {            
+            (*quant_removidas)++;
+            char **aux;
+            aux = (char **) realloc(*palavras_removidas, (*quant_removidas) * sizeof(char **));
 
-        // if((*arvore)->info.palavrasEng == NULL)
-        //     arvorevp_remover(arvore, (*arvore)->info.palavraPT);
+            if(aux != NULL)
+            {
+                *palavras_removidas = aux;
+                (*palavras_removidas)[(*quant_removidas) - 1] = (*arvore)->info.palavraPT;
+            }
+        }
+    }
+
+    return removeu;
+
+}
+    
+int remover_ingles_unidade(ArvoreVP **arvore, char *palavra_ingles, int unidade)
+{
+    char **palavras_removidas;
+    palavras_removidas = NULL;
+    int quant_removidas = 0;
+
+    int removeu = remover_ingles_unidade_aux(arvore, palavra_ingles, unidade, &palavras_removidas, &quant_removidas);
+
+    for(int i = 0; i < quant_removidas; i++)
+        arvorevp_remover(arvore, palavras_removidas[i]);
+
+    return removeu;
+}
+
+int remover_portugues_unidade_aux(ArvoreBB **arvore, int unidade)
+{
+    int removeu = 0;
+
+    if(*arvore != NULL)
+    {
+        removeu = remover_portugues_unidade_aux(&((*arvore)->direito), unidade) || removeu;
+        removeu = remover_portugues_unidade_aux(&((*arvore)->esquerdo), unidade) || removeu;
+
+        int removeu_unidade = lista_remover(&((*arvore)->info.unidade), unidade);
+        removeu = removeu || removeu_unidade;
+        if(removeu_unidade && (*arvore)->info.unidade == NULL)
+            arvorebb_remover(arvore, (*arvore)->info.palavraIngles);
     }
 
     return removeu;
 }
 
-// (iv)informar uma palavra em português e a unidade a qual a mesma pertence e então remove-la, para isto deve remover a palavra em inglês da árvore binária correspondente a palavra em português da mesma unidade. Caso ela seja a única palavra na árvore binária, a palavra em português deve ser removida da árvore 2-3.
+int remover_portugues_unidade(ArvoreVP **arvore, char *palavra_portugues, int unidade)
+{
+    int removeu = 0;
+    ArvoreVP *no;
+    no = arvorevp_buscar(*arvore, palavra_portugues);
 
-// TODO Dado uma palavra em português e uma unidade, remover todas as palavras inglesas daquela unidade. Caso não haja mais palavras (árvore vazia), remover a própria palavra em português
-// Criar uma auxiliar pra fazer as remoções, e a "main" faz a verificação e remoção da própria palavra
+    if(no != NULL)
+    {
+        removeu = remover_portugues_unidade_aux(&(no->info.palavrasEng), unidade);
+        if(no->info.palavrasEng == NULL)
+            arvorevp_remover(arvore, palavra_portugues);
+    }
 
-// int remover_portugues_unidade(ArvoreVP **arvore, char *palavra_portugues, int unidade)
+    return removeu;
+}
 
 
 void menu()
@@ -67,12 +117,22 @@ int main()
     // printf("\n\n");
     // arvorevp_exibir_pre(arvore);
 
-    char *palavra = {"Bug"};
-    int unidade = 2;
-    printf("\n[Removendo %s da Unidade %d]\n", palavra, unidade);
-    remover_ingles_unidade(&arvore, palavra, unidade);
-    remover_ingles_unidade(&arvore, palavra, 1);
-    printf("\n\n");
-    arvorevp_exibir_pre(arvore);
+
+    // char *palavra = {"Fan"};
+    // int unidade = 2;
+    // printf("\n[Removendo %s da Unidade %d]\n", palavra, unidade);
+    // remover_ingles_unidade(&arvore, "Coller", 1);
+    // remover_ingles_unidade(&arvore, palavra, unidade);
+    // printf("\n\n");
+    // arvorevp_exibir_pre(arvore);
+
+
+    // char *palavra = {"ventilador"};
+    // int unidade = 1;
+    // printf("\n[Removendo %s da Unidade %d]\n", palavra, unidade);
+    // remover_portugues_unidade(&arvore, palavra, unidade);
+    // remover_portugues_unidade(&arvore, palavra, 2);
+    // printf("\n\n");
+    // arvorevp_exibir_pre(arvore);
     return 0;
 }

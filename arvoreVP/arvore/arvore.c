@@ -283,7 +283,7 @@ int arvorevp_remover_no(ArvoreVP **raiz, char *palavra)
                         mover_direita(raiz);
                 }
 
-                if(resultado == 0)
+                if(strcmp(palavra, (*raiz)->info.palavraPT) == 0)
                 {
                     ArvoreVP *menor;
                     menor = menor_filho((*raiz)->direito);
