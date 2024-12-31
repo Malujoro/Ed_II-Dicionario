@@ -305,7 +305,8 @@ int arvorevp_remover_no(ArvoreVP **raiz, char *palavra)
 
 ArvoreVP *arvorevp_inserir(ArvoreVP **raiz, DataPT info)
 {
-    ArvoreVP *inseriu = arvorevp_inserir_no(raiz, info);
+    ArvoreVP *inseriu;
+    inseriu = arvorevp_inserir_no(raiz, info);
 
     if(*raiz != NULL)
         (*raiz)->cor = PRETO;
