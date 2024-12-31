@@ -115,7 +115,7 @@ int main()
     // remover_ingles_unidade(&arvore, palavra, unidade);
     // remover_ingles_unidade(&arvore, palavra, 1);
     // printf("\n\n");
-    // arvorevp_exibir_pre(arvore);
+    arvorevp_exibir_pre(arvore);
 
 
     // char *palavra = {"Fan"};

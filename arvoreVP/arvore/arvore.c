@@ -34,6 +34,7 @@ ArvoreVP *arvorevp_criar()
     return NULL;
 }
 
+// TODO desalocar palavras
 void no_desalocar(ArvoreVP **raiz)
 {
     free(*raiz);
