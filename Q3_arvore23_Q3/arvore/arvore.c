@@ -2,19 +2,19 @@
 #include <stdlib.h>
 #include "arvore.h"
 
-static int eh_folha(Arvore23 no)
+int eh_folha(Arvore23 no)
 {
     return no.esquerdo == NULL;
 }
 
 static int eh_info1(Arvore23 no, int info)
 {
-    return info == no.info1.numero;
+    return info == no.info1.numero_inicial;
 }
 
 static int eh_info2(Arvore23 no, int info)
 {
-    return no.n_infos == 2 && info == no.info2.numero;
+    return no.n_infos == 2 && info == no.info2.numero_inicial;
 }
 
 static int calcular_altura(Arvore23 *no)
@@ -83,12 +83,12 @@ Arvore23 *no23_criar(Data info, Arvore23 *filho_esquerdo, Arvore23 *filho_centro
 static Arvore23 *no23_quebrar(Arvore23 *no, Data info, Data *promove, Arvore23 *filho_maior)
 {
     Arvore23 *maior;
-    if(info.numero > no->info2.numero)
+    if(info.numero_inicial > no->info2.numero_inicial)
     {
         *promove = no->info2;
         maior = no23_criar(info, no->direito, filho_maior);
     }
-    else if(info.numero > no->info1.numero)
+    else if(info.numero_inicial > no->info1.numero_inicial)
     {
         *promove = info;
         maior = no23_criar(no->info2, filho_maior, no->direito);
@@ -108,7 +108,7 @@ static Arvore23 *no23_quebrar(Arvore23 *no, Data info, Data *promove, Arvore23 *
 
 static void no23_adicionar_info(Arvore23 *no, Data info, Arvore23 *filho_maior)
 {
-    if(info.numero > no->info1.numero)
+    if(info.numero_inicial > no->info1.numero_inicial)
     {
         no->info2 = info;
         no->direito = filho_maior;
@@ -135,9 +135,9 @@ static Arvore23 *no23_juntar(Arvore23 *filho1, Data info, Arvore23 *maior, Arvor
     return filho1;
 }
 
-Data no23_maior_info(Arvore23 *raiz)
+Data *no23_maior_info(Arvore23 *raiz)
 {
-    return raiz->n_infos == 2 ? raiz->info2 : raiz->info1;
+    return raiz->n_infos == 2 ? &(raiz->info2) : &(raiz->info1);
 }
 
 Arvore23 *arvore23_criar()
@@ -154,9 +154,9 @@ Arvore23 *arvore23_buscar(Arvore23 *raiz, int info)
     {
         if(eh_info1(*raiz, info) || eh_info2(*raiz, info))
             no = raiz;
-        else if(info < raiz->info1.numero)
+        else if(info < raiz->info1.numero_inicial)
             no = arvore23_buscar(raiz->esquerdo, info);
-        else if(raiz->n_infos == 1 || info < raiz->info2.numero)
+        else if(raiz->n_infos == 1 || info < raiz->info2.numero_inicial)
             no = arvore23_buscar(raiz->centro, info);
         else
             no = arvore23_buscar(raiz->direito, info);
@@ -179,7 +179,7 @@ Arvore23 *arvore23_buscar_menor_filho(Arvore23 *raiz, Arvore23 **pai)
     return filho;
 }
 
-Arvore23 *arvore23_buscar_maior_filho(Arvore23 *raiz, Arvore23 **pai, Data *maior_valor)
+Arvore23 *arvore23_buscar_maior_filho(Arvore23 *raiz, Arvore23 **pai, Data **maior_valor)
 {
     Arvore23 *filho;
     filho = raiz;
@@ -208,9 +208,9 @@ Arvore23 *arvore23_buscar_pai(Arvore23 *raiz, int info)
     {
         if(!eh_info1(*raiz, info) && !eh_info2(*raiz, info))
         {
-            if(info < raiz->info1.numero)
+            if(info < raiz->info1.numero_inicial)
                 pai = arvore23_buscar_pai(raiz->esquerdo, info);
-            else if(raiz->n_infos == 1 || info < raiz->info2.numero)
+            else if(raiz->n_infos == 1 || info < raiz->info2.numero_inicial)
                 pai = arvore23_buscar_pai(raiz->centro, info);
             else
                 pai = arvore23_buscar_pai(raiz->direito, info);
@@ -232,14 +232,14 @@ Arvore23 *arvore23_buscar_maior_pai(Arvore23 *raiz, int info)
     {
         if(!eh_info1(*raiz, info) && !eh_info2(*raiz, info))
         {
-            if(info < raiz->info1.numero)
+            if(info < raiz->info1.numero_inicial)
                 pai = arvore23_buscar_maior_pai(raiz->esquerdo, info);
-            else if(raiz->n_infos == 1 || info < raiz->info2.numero)
+            else if(raiz->n_infos == 1 || info < raiz->info2.numero_inicial)
                 pai = arvore23_buscar_maior_pai(raiz->centro, info);
             else
                 pai = arvore23_buscar_maior_pai(raiz->direito, info);
 
-            if(pai == NULL && ((raiz->n_infos == 1 && raiz->info1.numero > info) || (raiz->n_infos == 2 && raiz->info2.numero > info)))
+            if(pai == NULL && ((raiz->n_infos == 1 && raiz->info1.numero_inicial > info) || (raiz->n_infos == 2 && raiz->info2.numero_inicial > info)))
                 pai = raiz;
         }
     }
@@ -256,14 +256,14 @@ Arvore23 *arvore23_buscar_menor_pai(Arvore23 *raiz, int info)
     {
         if(!eh_info1(*raiz, info) && !eh_info2(*raiz, info))
         {
-            if(info < raiz->info1.numero)
+            if(info < raiz->info1.numero_inicial)
                 pai = arvore23_buscar_menor_pai(raiz->esquerdo, info);
-            else if(raiz->n_infos == 1 || info < raiz->info2.numero)
+            else if(raiz->n_infos == 1 || info < raiz->info2.numero_inicial)
                 pai = arvore23_buscar_menor_pai(raiz->centro, info);
             else
                 pai = arvore23_buscar_menor_pai(raiz->direito, info);
 
-            if(pai == NULL && raiz->info1.numero < info)
+            if(pai == NULL && raiz->info1.numero_inicial < info)
                 pai = raiz;
         }
     }
@@ -280,14 +280,14 @@ static Arvore23 *arvore23_buscar_menor_pai_2_infos(Arvore23 *raiz, int info)
     {
         if(!eh_info1(*raiz, info) && !eh_info2(*raiz, info))
         {
-            if(info < raiz->info1.numero)
+            if(info < raiz->info1.numero_inicial)
                 pai = arvore23_buscar_menor_pai_2_infos(raiz->esquerdo, info);
-            else if(raiz->n_infos == 1 || info < raiz->info2.numero)
+            else if(raiz->n_infos == 1 || info < raiz->info2.numero_inicial)
                 pai = arvore23_buscar_menor_pai_2_infos(raiz->centro, info);
             else
                 pai = arvore23_buscar_menor_pai_2_infos(raiz->direito, info);
 
-            if(pai == NULL && raiz->n_infos == 2 && raiz->info2.numero < info)
+            if(pai == NULL && raiz->n_infos == 2 && raiz->info2.numero_inicial < info)
                 pai = raiz;
         }
     }
@@ -297,7 +297,7 @@ static Arvore23 *arvore23_buscar_menor_pai_2_infos(Arvore23 *raiz, int info)
 
 static int movimento_onda(Data saindo, Data *entrada, Arvore23 *pai, Arvore23 **origem, Arvore23 **raiz, Arvore23 **maior, int (*funcao_remover)(Arvore23 **, int, Arvore23 *, Arvore23 **, Arvore23 **))
 {
-    int removeu = funcao_remover(raiz, saindo.numero, pai, origem, maior);
+    int removeu = funcao_remover(raiz, saindo.numero_inicial, pai, origem, maior);
     *entrada = saindo;
     return removeu;
 }
@@ -317,7 +317,7 @@ void arvore23_desalocar(Arvore23 **raiz)
     }
 }
 
-Arvore23 *arvore23_inserir(Arvore23 **raiz, Data info, Arvore23 *pai, Data *promove)
+Arvore23 *arvore23_inserir_no(Arvore23 **raiz, Data info, Arvore23 *pai, Data *promove)
 {
     Arvore23 *maior;
     maior = NULL;
@@ -342,12 +342,12 @@ Arvore23 *arvore23_inserir(Arvore23 **raiz, Data info, Arvore23 *pai, Data *prom
         }
         else
         {
-            if(info.numero < (*raiz)->info1.numero)
-                maior = arvore23_inserir(&((*raiz)->esquerdo), info, *raiz, promove);
-            else if((*raiz)->n_infos == 1 || info.numero < (*raiz)->info2.numero)
-                maior = arvore23_inserir(&((*raiz)->centro), info, *raiz, promove);
+            if(info.numero_inicial < (*raiz)->info1.numero_inicial)
+                maior = arvore23_inserir_no(&((*raiz)->esquerdo), info, *raiz, promove);
+            else if((*raiz)->n_infos == 1 || info.numero_inicial < (*raiz)->info2.numero_inicial)
+                maior = arvore23_inserir_no(&((*raiz)->centro), info, *raiz, promove);
             else
-                maior = arvore23_inserir(&((*raiz)->direito), info, *raiz, promove);
+                maior = arvore23_inserir_no(&((*raiz)->direito), info, *raiz, promove);
 
             if(maior != NULL)
             {
@@ -374,11 +374,18 @@ Arvore23 *arvore23_inserir(Arvore23 **raiz, Data info, Arvore23 *pai, Data *prom
     return maior;
 }
 
+Arvore23 *arvore23_inserir(Arvore23 **raiz, Data info)
+{
+    Data promove;
+    return arvore23_inserir_no(raiz, info, NULL, &promove);
+}
+
+
 static int arvore23_remover_no_interno1(Arvore23 **origem, Arvore23* raiz, Data *info, Arvore23 *filho1, Arvore23 *filho2, Arvore23 **maior)
 {
     int removeu;
     Arvore23 *filho, *pai;
-    Data info_filho;
+    Data *info_filho;
 
     pai = raiz;
 
@@ -386,7 +393,7 @@ static int arvore23_remover_no_interno1(Arvore23 **origem, Arvore23* raiz, Data 
 
     if(filho->n_infos == 2)
     {
-        *info = info_filho;
+        *info = *info_filho;
         filho->n_infos = 1;
     }
     else
@@ -402,7 +409,7 @@ static int arvore23_remover_no_interno2(Arvore23 **origem, Arvore23* raiz, Data 
 {
     int removeu;
     Arvore23 *filho, *pai;
-    Data info_filho;
+    Data *info_filho;
 
     pai = raiz;
 
@@ -417,7 +424,7 @@ static int arvore23_remover_no_interno2(Arvore23 **origem, Arvore23* raiz, Data 
     else
     {
         filho = arvore23_buscar_maior_filho(filho2, &pai, &info_filho);
-        removeu = movimento_onda(info_filho, info, pai, origem, &filho, maior, arvore23_remover2);
+        removeu = movimento_onda(*info_filho, info, pai, origem, &filho, maior, arvore23_remover2);
     }
 
     return removeu;
@@ -454,7 +461,7 @@ int arvore23_remover1(Arvore23 **raiz, int info, Arvore23 *pai, Arvore23 **orige
                         Data info_pai;
                         if(*raiz == pai->esquerdo || (pai->n_infos == 2 && *raiz == pai->centro))
                         {
-                            pai_aux = arvore23_buscar_pai(*origem, pai->info1.numero);
+                            pai_aux = arvore23_buscar_pai(*origem, pai->info1.numero_inicial);
                             
                             if(*raiz == pai->esquerdo)
                                 info_pai = pai->info1;
@@ -465,15 +472,15 @@ int arvore23_remover1(Arvore23 **raiz, int info, Arvore23 *pai, Arvore23 **orige
                         }
                         else // Filho do centro (com pai de 1 info) ou da direita
                         {
-                            pai_aux = arvore23_buscar_maior_pai(*origem, (*raiz)->info1.numero);
+                            pai_aux = arvore23_buscar_maior_pai(*origem, (*raiz)->info1.numero_inicial);
 
                             Arvore23 *menor_pai;
-                            menor_pai = arvore23_buscar_menor_pai_2_infos(*origem, (*raiz)->info1.numero);
+                            menor_pai = arvore23_buscar_menor_pai_2_infos(*origem, (*raiz)->info1.numero_inicial);
 
 
                             if(pai_aux != NULL)
                             {
-                                if(pai_aux->info1.numero > (*raiz)->info1.numero)
+                                if(pai_aux->info1.numero_inicial > (*raiz)->info1.numero_inicial)
                                     info_pai = pai_aux->info1;
                                 else
                                     info_pai = pai_aux->info2;
@@ -482,7 +489,7 @@ int arvore23_remover1(Arvore23 **raiz, int info, Arvore23 *pai, Arvore23 **orige
                             int altura_menor_pai = calcular_altura(menor_pai);
                             int altura_pai_aux = calcular_altura(pai_aux);
 
-                            if(pai_aux == NULL || (pai_aux != pai && menor_pai != NULL && altura_menor_pai <= altura_pai_aux && info_pai.numero > menor_pai->info2.numero))
+                            if(pai_aux == NULL || (pai_aux != pai && menor_pai != NULL && altura_menor_pai <= altura_pai_aux && info_pai.numero_inicial > menor_pai->info2.numero_inicial))
                             {
                                 *maior = pai;
                                 (*raiz)->n_infos = 0;
@@ -492,7 +499,7 @@ int arvore23_remover1(Arvore23 **raiz, int info, Arvore23 *pai, Arvore23 **orige
                             {
 
                                 Arvore23 *avo;
-                                avo = arvore23_buscar_pai(*origem, info_pai.numero);
+                                avo = arvore23_buscar_pai(*origem, info_pai.numero_inicial);
                                 removeu = movimento_onda(info_pai, &((*raiz)->info1), avo, origem, &pai_aux, maior, arvore23_remover1);
                             }
                         }
@@ -506,9 +513,9 @@ int arvore23_remover1(Arvore23 **raiz, int info, Arvore23 *pai, Arvore23 **orige
         }
         else
         {
-            if(info < (*raiz)->info1.numero)
+            if(info < (*raiz)->info1.numero_inicial)
                 removeu = arvore23_remover1(&(*raiz)->esquerdo, info, *raiz, origem, maior);
-            else if((*raiz)->n_infos == 1 || info < (*raiz)->info2.numero)
+            else if((*raiz)->n_infos == 1 || info < (*raiz)->info2.numero_inicial)
                 removeu = arvore23_remover1(&(*raiz)->centro, info, *raiz, origem, maior);
             else
                 removeu = arvore23_remover1(&(*raiz)->direito, info, *raiz, origem, maior);
@@ -548,7 +555,7 @@ int arvore23_remover2(Arvore23 **raiz, int info, Arvore23 *pai, Arvore23 **orige
                         Data info_pai;
                         if(*raiz == pai->centro || (pai->n_infos == 2 && *raiz == pai->direito))
                         {
-                            pai_aux = arvore23_buscar_pai(*origem, pai->info1.numero);
+                            pai_aux = arvore23_buscar_pai(*origem, pai->info1.numero_inicial);
                             
                             if(*raiz == pai->centro)
                                 info_pai = pai->info1;
@@ -559,10 +566,10 @@ int arvore23_remover2(Arvore23 **raiz, int info, Arvore23 *pai, Arvore23 **orige
                         }
                         else // Filho da esquerda
                         {
-                            pai_aux = arvore23_buscar_menor_pai(*origem, (*raiz)->info1.numero);
+                            pai_aux = arvore23_buscar_menor_pai(*origem, (*raiz)->info1.numero_inicial);
 
                             Arvore23 *menor_pai;
-                            menor_pai = arvore23_buscar_menor_pai_2_infos(*origem, (*raiz)->info1.numero);
+                            menor_pai = arvore23_buscar_menor_pai_2_infos(*origem, (*raiz)->info1.numero_inicial);
 
                             Arvore23 *avo;
                             if(pai_aux == NULL || (pai_aux != pai && menor_pai != NULL))
@@ -572,12 +579,12 @@ int arvore23_remover2(Arvore23 **raiz, int info, Arvore23 *pai, Arvore23 **orige
                             }
                             else
                             {
-                                if(pai_aux->n_infos == 2 && pai_aux->info2.numero < (*raiz)->info1.numero)
+                                if(pai_aux->n_infos == 2 && pai_aux->info2.numero_inicial < (*raiz)->info1.numero_inicial)
                                     info_pai = pai_aux->info2;
                                 else
                                     info_pai = pai_aux->info1;
 
-                                avo = arvore23_buscar_pai(*origem, info_pai.numero);
+                                avo = arvore23_buscar_pai(*origem, info_pai.numero_inicial);
                                 removeu = movimento_onda(info_pai, &((*raiz)->info1), avo, origem, &pai_aux, maior, arvore23_remover2);
                             }
                         }
@@ -591,9 +598,9 @@ int arvore23_remover2(Arvore23 **raiz, int info, Arvore23 *pai, Arvore23 **orige
         }
         else
         {
-            if(info < (*raiz)->info1.numero)
+            if(info < (*raiz)->info1.numero_inicial)
                 removeu = arvore23_remover2(&(*raiz)->esquerdo, info, *raiz, origem, maior);
-            else if((*raiz)->n_infos == 1 || info < (*raiz)->info2.numero)
+            else if((*raiz)->n_infos == 1 || info < (*raiz)->info2.numero_inicial)
                 removeu = arvore23_remover2(&(*raiz)->centro, info, *raiz, origem, maior);
             else
                 removeu = arvore23_remover2(&(*raiz)->direito, info, *raiz, origem, maior);
@@ -610,17 +617,17 @@ int arvore23_remover(Arvore23 **raiz, int info)
     if(removeu == -1)
     {
         removeu = 1;
-        Data valor_juncao = no23_maior_info(posicao_juncao);
+        Data valor_juncao = *(no23_maior_info(posicao_juncao));
         maior = NULL;
-        int removeu_aux = arvore23_rebalancear(raiz, valor_juncao.numero, &maior);
+        int removeu_aux = arvore23_rebalancear(raiz, valor_juncao.numero_inicial, &maior);
         
         if(removeu_aux == -1)
         {
             Arvore23 *pai, *posicao_juncao2;
             Data *entrada;
-            pai = arvore23_buscar_pai(*raiz, valor_juncao.numero);
+            pai = arvore23_buscar_pai(*raiz, valor_juncao.numero_inicial);
 
-            if(eh_info1(*posicao_juncao, valor_juncao.numero))
+            if(eh_info1(*posicao_juncao, valor_juncao.numero_inicial))
                 entrada = &(posicao_juncao->centro->info1);
             else
                 entrada = &(posicao_juncao->direito->info1);
@@ -630,12 +637,12 @@ int arvore23_remover(Arvore23 **raiz, int info)
             if(removeu_aux == -1)
             {
                 valor_juncao = posicao_juncao2->info1;
-                pai = arvore23_buscar_pai(*raiz, valor_juncao.numero);
+                pai = arvore23_buscar_pai(*raiz, valor_juncao.numero_inicial);
                 removeu_aux = movimento_onda(valor_juncao, &(posicao_juncao2->esquerdo->info1), pai, raiz, &posicao_juncao2, &posicao_juncao, arvore23_remover1);
 
-                valor_juncao = no23_maior_info(posicao_juncao);
+                valor_juncao = *(no23_maior_info(posicao_juncao));
                 maior = NULL;
-                removeu_aux = arvore23_rebalancear(raiz, valor_juncao.numero, &maior);
+                removeu_aux = arvore23_rebalancear(raiz, valor_juncao.numero_inicial, &maior);
             }
         }
 
@@ -667,9 +674,9 @@ int arvore23_rebalancear(Arvore23 **raiz, int info, Arvore23 **maior)
     {
         if(!eh_folha(**raiz))
         {
-            if(info < (*raiz)->info1.numero)
+            if(info < (*raiz)->info1.numero_inicial)
                 balanceou = arvore23_rebalancear(&((*raiz)->esquerdo), info, maior);
-            else if((*raiz)->n_infos == 1 || info < (*raiz)->info2.numero)
+            else if((*raiz)->n_infos == 1 || info < (*raiz)->info2.numero_inicial)
             {
                 if((*raiz)->esquerdo->n_infos == 2 && !possivel_remover((*raiz)->centro))
                     balanceou = -1;
@@ -698,13 +705,23 @@ int arvore23_rebalancear(Arvore23 **raiz, int info, Arvore23 **maior)
     return balanceou;
 }
 
+void no23_exibir(Data no)
+{
+    printf("Bloco de [%d] até [%d] - [%s]\n", no.numero_inicial, no.numero_final, no.status == LIVRE ? "Livre" : "Ocupado");
+    // printf("%d -> ", no.numero_inicial);
+}
+
 void arvore23_exibir_pre(Arvore23 *raiz)
 {
     if(raiz != NULL)
     {
-        printf("[1º] %d -> ", raiz->info1.numero);
+        printf("[1º] ");
+        no23_exibir(raiz->info1);
         if(raiz->n_infos == 2)
-            printf("[2º] %d -> ", raiz->info2.numero);
+        {
+            printf("[2º] ");
+            no23_exibir(raiz->info2);
+        }
 
         arvore23_exibir_pre(raiz->esquerdo);
         arvore23_exibir_pre(raiz->centro);
@@ -718,12 +735,14 @@ void arvore23_exibir_ordem(Arvore23 *raiz)
     if(raiz != NULL)
     {
         arvore23_exibir_ordem(raiz->esquerdo);
-        printf("[1º] %d -> ", raiz->info1.numero);
+        printf("[1º] ");
+        no23_exibir(raiz->info1);
         arvore23_exibir_ordem(raiz->centro);
 
         if(raiz->n_infos == 2)
         {
-            printf("[2º] %d -> ", raiz->info2.numero);
+            printf("[2º] ");
+            no23_exibir(raiz->info2);
             arvore23_exibir_ordem(raiz->direito);
         }
     }
@@ -738,9 +757,13 @@ void arvore23_exibir_pos(Arvore23 *raiz)
         if(raiz->n_infos == 2)
             arvore23_exibir_pos(raiz->direito);
 
-        printf("[1º] %d -> ", raiz->info1.numero);
+        printf("[1º] ");
+        no23_exibir(raiz->info1);
         if(raiz->n_infos == 2)
-            printf("[2º] %d -> ", raiz->info2.numero);
+        {
+            printf("[2º] ");
+            no23_exibir(raiz->info2);
+        }
     }
 }
 
@@ -914,15 +937,14 @@ int main1()
     Arvore23 *arvore, *arvore2;
     arvore = arvore23_criar();
     arvore2 = arvore23_criar();
-    Data *promove = (Data *) malloc(sizeof(Data));
 
     for(int i = 0; i < tam; i++)
     {
         Data info;
-        info.numero = valores[i];
+        info.numero_inicial = valores[i];
         
-        arvore23_inserir(&arvore, info, NULL, promove);
-        arvore23_inserir(&arvore2, info, NULL, promove);
+        arvore23_inserir(&arvore, info);
+        arvore23_inserir(&arvore2, info);
     }
 
     printf("\n\nÁrvore após inserção: \n");
@@ -957,7 +979,6 @@ int main2()
 
     Arvore23 *arvore;
     arvore = arvore23_criar();
-    Data promove;
 
     for(int i = 1; i <= 19; i++)
     {
@@ -967,8 +988,8 @@ int main2()
         for(int j = 0; j < tam; j++)
         {
             Data info;
-            info.numero = valores[j];
-            arvore23_inserir(&arvore, info, NULL, &promove);
+            info.numero_inicial = valores[j];
+            arvore23_inserir(&arvore, info);
         }
         printf("\n\nÁrvore após inserção: \n");
         arvore23_exibir_pre(arvore);
@@ -984,10 +1005,10 @@ int main2()
     return 0;
 }
 
-int main()
-{
-    main1();
-    main2();
+// int main()
+// {
+//     main1();
+//     main2();
 
-    return 0;
-}
+//     return 0;
+// }

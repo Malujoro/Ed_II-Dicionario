@@ -1,8 +1,17 @@
 #ifndef ARVORE23_H
 #define ARVORE23_H
+
+#define OCUPADO 0
+#define LIVRE 1
+
+
 typedef struct data
 {
-    int numero;
+    int numero_inicial;
+    int numero_final;
+    int *endereco_inicial;
+    int *endereco_final;
+    int status;
 } Data;
 
 typedef struct arvore23
@@ -16,14 +25,15 @@ typedef struct arvore23
 } Arvore23;
 
 
+int eh_folha(Arvore23 no);
+
 Arvore23 *no23_alocar();
 
 void no23_desalocar(Arvore23 **no);
 
 Arvore23 *no23_criar(Data info, Arvore23 *filho_esquerdo, Arvore23 *filho_centro);
 
-Data no23_maior_info(Arvore23 *raiz);
-
+Data *no23_maior_info(Arvore23 *raiz);
 
 Arvore23 *arvore23_criar();
 
@@ -31,7 +41,7 @@ Arvore23 *arvore23_buscar(Arvore23 *raiz, int info);
 
 Arvore23 *arvore23_buscar_menor_filho(Arvore23 *raiz, Arvore23 **pai);
 
-Arvore23 *arvore23_buscar_maior_filho(Arvore23 *raiz, Arvore23 **pai, Data *maior_valor);
+Arvore23 *arvore23_buscar_maior_filho(Arvore23 *raiz, Arvore23 **pai, Data **maior_valor);
 
 Arvore23 *arvore23_buscar_pai(Arvore23 *raiz, int info);
 
@@ -41,7 +51,7 @@ Arvore23 *arvore23_buscar_menor_pai(Arvore23 *raiz, int info);
 
 void arvore23_desalocar(Arvore23 **raiz);
 
-Arvore23 *arvore23_inserir(Arvore23 **raiz, Data info, Arvore23 *pai, Data *promove);
+Arvore23 *arvore23_inserir(Arvore23 **raiz, Data info);
 
 int arvore23_remover1(Arvore23 **raiz, int info, Arvore23 *pai, Arvore23 **origem, Arvore23 **maior);
 
@@ -51,12 +61,12 @@ int arvore23_remover(Arvore23 **raiz, int info);
 
 int arvore23_rebalancear(Arvore23 **raiz, int info, Arvore23 **maior);
 
+void no23_exibir(Data no);
+
 void arvore23_exibir_pre(Arvore23 *raiz);
 
 void arvore23_exibir_ordem(Arvore23 *raiz);
 
 void arvore23_exibir_pos(Arvore23 *raiz);
-
-Arvore23 *arvore23_buscar();
 
 #endif
