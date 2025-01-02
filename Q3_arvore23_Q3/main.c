@@ -125,9 +125,9 @@ Arvore23 *buscar_menor_bloco(Arvore23 **raiz, Arvore23 *no, Data *info, Data **v
         }
     }
     else if(no->info1.numero_inicial == info->numero_inicial)
-        menor = arvore23_buscar_maior_filho((*raiz)->esquerdo, &pai, valor_menor);
+        menor = arvore23_buscar_maior_filho(no->esquerdo, &pai, valor_menor);
     else
-        menor = arvore23_buscar_maior_filho((*raiz)->centro, &pai, valor_menor);
+        menor = arvore23_buscar_maior_filho(no->centro, &pai, valor_menor);
 
     return menor;
 }
@@ -155,9 +155,9 @@ Arvore23 *buscar_maior_bloco(Arvore23 **raiz, Arvore23 *no, Data *info, Data **v
     else
     {
         if(no->info1.numero_inicial == info->numero_inicial)
-            maior = arvore23_buscar_menor_filho((*raiz)->centro, &pai);
+            maior = arvore23_buscar_menor_filho(no->centro, &pai);
         else
-            maior = arvore23_buscar_menor_filho((*raiz)->direito, &pai);
+            maior = arvore23_buscar_menor_filho(no->direito, &pai);
 
         if(maior != NULL)
             *valor_maior = &(maior->info1);
@@ -319,12 +319,13 @@ int main_teste()
     arvore = arvore23_criar();
 
     // int valores[] = {19, 39, 60, 80, 100};
-    int valores[] = {9, 19, 39, 69, 109};
+    // int valores[] = {9, 19, 39, 69, 109};
+    int valores[] = {10, 20, 40, 50, 60, 70, 80, 90, 100, 110, 120, 130};
     // int valores[] = {10, 33, 35, 99};
     // int valores[] = {8, 20, 30};
     // int valores[] = {9};
     int tam = sizeof(valores) / sizeof(int);
-    int inicio = 0, status = LIVRE;
+    int inicio = 0, status = OCUPADO;
     Data no;
 
     for(int i = 0; i < tam; i++)
@@ -339,10 +340,12 @@ int main_teste()
         inicio = no.numero_final + 1;
     }
 
-    arvore23_exibir_ordem(arvore);
+    arvore23_exibir_pre(arvore);
 
-    int vetor_nos[] = {40, 70, 10};
-    int vetor_status[] = {LIVRE, OCUPADO, OCUPADO};
+    int vetor_nos[] = {10};
+    // int vetor_nos[] = {40, 70, 10};
+    int vetor_status[] = {LIVRE};
+    // int vetor_status[] = {LIVRE, OCUPADO, OCUPADO};
     int quant1 = sizeof(vetor_nos) / sizeof(int);
     int quant2 = sizeof(vetor_status) / sizeof(int);
     int quant = quant1 <= quant2 ? quant1 : quant2;
@@ -360,6 +363,6 @@ int main_teste()
 
 int main()
 {
-    // main_teste();
-    main_main();
+    main_teste();
+    // main_main();
 }
