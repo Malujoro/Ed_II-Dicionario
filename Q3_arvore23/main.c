@@ -141,15 +141,16 @@ Arvore23 *buscar_maior_bloco(Arvore23 **raiz, Arvore23 *no, Data *info, Data **v
     if(eh_folha(*no))
     {
         if(no->n_infos == 2 && no->info1.numero_inicial == info->numero_inicial)
-        {
             maior = no;
-            *valor_maior = &(no->info2);
-        }
         else
-        {
             maior = arvore23_buscar_maior_pai(*raiz, info->numero_inicial);
-            if(maior != NULL)
-                *valor_maior = no23_maior_info(maior);
+
+        if(maior != NULL)
+        {
+            if(maior->info1.numero_inicial > info->numero_inicial)
+                *valor_maior = &(maior->info1);
+            else
+                *valor_maior = &(maior->info2);
         }
     }
     else
@@ -320,12 +321,13 @@ int main_teste()
 
     // int valores[] = {19, 39, 60, 80, 100};
     // int valores[] = {9, 19, 39, 69, 109};
-    int valores[] = {10, 20, 40, 50, 60, 70, 80, 90, 100, 110, 120, 130};
+    // int valores[] = {10, 20, 40, 50, 60, 70, 80, 90, 100, 110, 120, 130};
+    int valores[] = {20, 40, 60, 80, 100,};
     // int valores[] = {10, 33, 35, 99};
     // int valores[] = {8, 20, 30};
     // int valores[] = {9};
     int tam = sizeof(valores) / sizeof(int);
-    int inicio = 0, status = OCUPADO;
+    int inicio = 0, status = LIVRE;
     Data no;
 
     for(int i = 0; i < tam; i++)
@@ -342,15 +344,13 @@ int main_teste()
 
     arvore23_exibir_pre(arvore);
 
-    int vetor_nos[] = {10};
+    int vetor_nos[] = {21};
     // int vetor_nos[] = {40, 70, 10};
     int vetor_status[] = {LIVRE};
     // int vetor_status[] = {LIVRE, OCUPADO, OCUPADO};
     int quant1 = sizeof(vetor_nos) / sizeof(int);
     int quant2 = sizeof(vetor_status) / sizeof(int);
     int quant = quant1 <= quant2 ? quant1 : quant2;
-    status = LIVRE;
-    // status = OCUPADO;
 
     for(int i = 0; i < quant; i++)
     {
