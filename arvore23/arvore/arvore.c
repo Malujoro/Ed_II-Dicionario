@@ -912,7 +912,8 @@ int main1()
 
     // int valores[] = {5000, 4000, 1000, 2000, 1500, 500, 300, 6000, 8000, 7000};
     // int valores[] = {8000, 10000, 15000, 1000, 3000, 7000, 5800, 4200, 2500, 1800, 9000, 7500, 6500, 4300, 3500, 9500, 2100, 500, 900, 100, 600, 1700, 2400, 1250, 1750, 250};
-    char *valores[] = {"v", "y", "z", "f", "n", "t", "r", "p", "m", "j", "w", "u", "s", "q", "o", "x", "k", "c", "e", "a", "d", "h", "l", "g", "i", "b"};
+    // char *valores[] = {"v", "y", "z", "f", "n", "t", "r", "p", "m", "j", "w", "u", "s", "q", "o", "x", "k", "c", "e", "a", "d", "h", "l", "g", "i", "b"};
+    char *valores[] = {"ônibus", "barramento", "inseto", "problema", "bicicleta", "ventilador", "rede de computadores", "sistema", "rede de relacionamento", "chave", "abacaxi", "armazenamento", "amigo", "arquivo", "bola", "cabo", "computador", "janela", "mesa", "ponteiro", "protocolo"};
     // int valores[] = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'x', 'w', 'y', 'z'};
     // int valores[] = {30, 120, 100, 50, 170, 150, 140, 200};
     // int valores[] = {2, 4, 7, 3, 1, 6, 5};
