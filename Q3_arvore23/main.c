@@ -321,13 +321,16 @@ int main_teste()
 
     // int valores[] = {19, 39, 60, 80, 100};
     // int valores[] = {9, 19, 39, 69, 109};
+    int valores[] = {19, 40, 60, 80, 100};
     // int valores[] = {10, 20, 40, 50, 60, 70, 80, 90, 100, 110, 120, 130};
-    int valores[] = {20, 40, 60, 80, 100,};
+    // int valores[] = {20, 40, 60, 80, 100,};
+    // int valores[] = {9, 20, 30, 40, 60, 80, 100,};
+    // int valores[] = {40, 50, 60, 70, 80, 90, 100,};
     // int valores[] = {10, 33, 35, 99};
     // int valores[] = {8, 20, 30};
     // int valores[] = {9};
     int tam = sizeof(valores) / sizeof(int);
-    int inicio = 0, status = LIVRE;
+    int inicio = 0, status = OCUPADO;
     Data no;
 
     for(int i = 0; i < tam; i++)
@@ -342,11 +345,11 @@ int main_teste()
         inicio = no.numero_final + 1;
     }
 
-    arvore23_exibir_pre(arvore);
+    arvore23_exibir_ordem(arvore);
 
-    int vetor_nos[] = {21};
+    int vetor_nos[] = {20};
     // int vetor_nos[] = {40, 70, 10};
-    int vetor_status[] = {LIVRE};
+    int vetor_status[] = {OCUPADO};
     // int vetor_status[] = {LIVRE, OCUPADO, OCUPADO};
     int quant1 = sizeof(vetor_nos) / sizeof(int);
     int quant2 = sizeof(vetor_status) / sizeof(int);

@@ -43,6 +43,11 @@ void arvorebb_desalocar(ArvoreBB **raiz)
         if ((*raiz)->direito != NULL)
             arvorebb_desalocar(&((*raiz)->direito));
 
+        free((*raiz)->info.palavraIngles);
+        (*raiz)->info.palavraIngles = NULL;
+
+        lista_desalocar(&((*raiz)->info.unidade));
+
         free(*raiz);
         *raiz = NULL;
     }
@@ -202,38 +207,3 @@ int arvorebb_remover(ArvoreBB **raiz, char *palavra)
 
     return removeu;
 }
-
-// int main()
-// {
-//     int tam, tam_remov;
-
-//     char *valores[] = {"banana", "ajuda", "abacate", "maca", "melao", "arroz", "maao"};
-//     char *removidos[] = {"arroz", "ajuda"};
-
-//     tam = sizeof(valores) / sizeof(char *);
-//     tam_remov = sizeof(removidos) / sizeof(char *);
-
-//     ArvoreBB *arvore;
-//     arvore = arvorebb_criar();
-
-//     for(int i = 0; i < tam; i++)
-//     {
-//         DataEng info;
-//         info.palavraIngles = valores[i];
-//         info.unidade = i % 2;
-
-//         arvorebb_inserir(&arvore, info);
-//     }
-//     printf("\n\nÁrvore após inserção: \n");
-//     arvorebb_exibir_pre(arvore);
-
-//     for(int i = 0; i < tam_remov; i++)
-//     {
-//         arvorebb_remover(&arvore, removidos[i]);
-//         printf("\n\nÁrvore após remover %s:\n", removidos[i]);
-//         arvorebb_exibir_pre(arvore);
-//     }
-
-//     printf("\n\n");
-//     return 0;
-// }

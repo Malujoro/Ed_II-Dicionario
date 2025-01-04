@@ -7,13 +7,13 @@ typedef struct lista
     struct lista *proximo;
 } Lista;
 
-Lista *no_lista_aloca();
+Lista *no_lista_alocar();
 
-Lista *no_lista_cria(int info);
+Lista *no_lista_criar(int info);
 
-Lista *lista_cria();
+Lista *lista_criar();
 
-void lista_desaloca(Lista **lista);
+void lista_desalocar(Lista **lista);
 
 void lista_inserir(Lista **lista, int info);
 

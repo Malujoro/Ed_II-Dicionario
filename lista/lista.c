@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include "lista.h"
 
-Lista *no_lista_aloca()
+Lista *no_lista_alocar()
 {
     Lista *no;
     no = (Lista *) malloc(sizeof(Lista));
@@ -16,26 +16,26 @@ Lista *no_lista_aloca()
     return no;
 }
 
-Lista *no_lista_cria(int info)
+Lista *no_lista_criar(int info)
 {
     Lista *no;
-    no = no_lista_aloca();
+    no = no_lista_alocar();
     no->info = info;
     no->proximo = NULL;
     return no;
 }
 
-Lista *lista_cria()
+Lista *lista_criar()
 {
     return NULL;
 }
 
-void lista_desaloca(Lista **lista)
+void lista_desalocar(Lista **lista)
 {
     if(*lista != NULL)
     {
         if((*lista)->proximo != NULL)
-            lista_desaloca(&(*lista)->proximo);
+            lista_desalocar(&(*lista)->proximo);
 
         free(*lista);
         *lista = NULL;
@@ -45,7 +45,7 @@ void lista_desaloca(Lista **lista)
 void lista_inserir(Lista **lista, int info)
 {
     Lista *no;
-    no = no_lista_cria(info);
+    no = no_lista_criar(info);
 
     no->proximo = (*lista);
     (*lista) = no;

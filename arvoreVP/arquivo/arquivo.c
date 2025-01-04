@@ -93,7 +93,7 @@ void processar_arquivo(const char *nome_arquivo, ArvoreVP **arvore) {
                     noVP = arvorevp_inserir(arvore, infoPT);
 
                     infoEng.palavraIngles = palavra_ingles;
-                    infoEng.unidade = lista_cria();
+                    infoEng.unidade = lista_criar();
                     noBB = arvorebb_inserir(&(noVP->info.palavrasEng), infoEng);
 
                     lista_inserir(&(noBB->info.unidade), unidade_atual);

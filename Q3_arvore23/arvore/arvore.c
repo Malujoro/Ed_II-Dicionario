@@ -708,7 +708,6 @@ int arvore23_rebalancear(Arvore23 **raiz, int info, Arvore23 **maior)
 void no23_exibir(Data no)
 {
     printf("Bloco de [%d] até [%d] - [%s]\n", no.numero_inicial, no.numero_final, no.status == LIVRE ? "Livre" : "Ocupado");
-    // printf("%d -> ", no.numero_inicial);
 }
 
 void arvore23_exibir_pre(Arvore23 *raiz)
@@ -967,6 +966,7 @@ int main1()
         arvore23_exibir_pre(arvore2);
     }
 
+    arvore23_desalocar(&arvore);
 
     printf("\n\n");
     return 0;

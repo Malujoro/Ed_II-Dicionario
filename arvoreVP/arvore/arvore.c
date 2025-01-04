@@ -34,11 +34,19 @@ ArvoreVP *arvorevp_criar()
     return NULL;
 }
 
-// TODO desalocar palavras
-void no_desalocar(ArvoreVP **raiz)
+void novp_desalocar(ArvoreVP **raiz)
 {
-    free(*raiz);
-    *raiz = NULL;
+    if(*raiz != NULL)
+    {
+        free((*raiz)->info.palavraPT);
+        (*raiz)->info.palavraPT = NULL;
+
+        arvorebb_desalocar(&((*raiz)->info.palavrasEng));
+
+        free(*raiz);
+        *raiz = NULL;
+    }
+
 }
 
 void arvorevp_desalocar(ArvoreVP **raiz)
@@ -51,7 +59,7 @@ void arvorevp_desalocar(ArvoreVP **raiz)
         if ((*raiz)->direito != NULL)
             arvorevp_desalocar(&((*raiz)->direito));
 
-        no_desalocar(raiz);
+        novp_desalocar(raiz);
     }
 }
 
@@ -202,7 +210,6 @@ void arvorevp_exibir_pos(ArvoreVP *raiz)
     }
 }
 
-// TODO chance de segment fault por não verificar raiz->direito != NULL
 void mover_esquerda(ArvoreVP **raiz)
 {
     trocar_cor(*raiz);
@@ -229,7 +236,7 @@ void mover_direita(ArvoreVP **raiz)
 void remover_menor(ArvoreVP **raiz)
 {
     if((*raiz)->esquerdo == NULL)
-        no_desalocar(raiz);
+        novp_desalocar(raiz);
     else
     {
         if(retornar_cor((*raiz)->esquerdo) == PRETO && retornar_cor((*raiz)->esquerdo->esquerdo) == PRETO)
@@ -275,7 +282,7 @@ int arvorevp_remover_no(ArvoreVP **raiz, char *palavra)
                 rotacao_direita(raiz);
 
             if(resultado == 0 && (*raiz)->direito == NULL)
-                no_desalocar(raiz);
+                novp_desalocar(raiz);
             else
             {
                 if((*raiz)->direito != NULL)
@@ -324,39 +331,3 @@ int arvorevp_remover(ArvoreVP **raiz, char *palavra)
 
     return removeu;
 }
-
-// int main()
-// {
-//     int tam, tam_remov;
-
-//     // int valores[] = {1000, 1500, 500, 2000, 2500, 750, 600, 400, 300, 550, 800};
-//     // char *valores[] = {1000, 4000, 3000, 2000, 500, 4500, 3500};
-//     char *valores[] = { "b",  "f",  "d",  "c", "a",  "g",  "e"};
-//     char *removidos[] = {"e", "c", "d", "4"};
-
-//     tam = sizeof(valores) / sizeof(char *);
-//     tam_remov = sizeof(removidos) / sizeof(char *);
-
-//     ArvoreVP *arvore;
-//     arvore = arvorevp_criar();
-
-//     for(int i = 0; i < tam; i++)
-//     {
-//         DataPT info;
-//         info.palavraPT = valores[i];
-        
-//         arvorevp_inserir(&arvore, info);
-//     }
-//     printf("\n\nÁrvore após inserção: \n");
-//     arvorevp_exibir_pre(arvore);
-
-//     for(int i = 0; i < tam_remov; i++)
-//     {
-//         arvorevp_remover(&arvore, removidos[i]);
-//         printf("\n\nÁrvore após remover %s:\n", removidos[i]);
-//         arvorevp_exibir_pre(arvore);
-//     }
-
-//     printf("\n\n");
-//     return 0;
-// }

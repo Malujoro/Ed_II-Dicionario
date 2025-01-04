@@ -79,13 +79,8 @@ void exibir_traducoes(ArvoreBB *arvoreBB)
         exibir_traducoes(arvoreBB->direito);
     }
 }
-
 void exibir_traducao_em_ingles(ArvoreVP *raiz, char *palavraPT)
 {
-    // char palavraPT[100];
-    // printf("Digite uma palavra em português: ");
-    // scanf(" %[^\n]", palavraPT);
-
      ArvoreVP *no = arvorevp_buscar(raiz, palavraPT);
 
     if (no != NULL)
@@ -100,8 +95,8 @@ void exibir_traducao_em_ingles(ArvoreVP *raiz, char *palavraPT)
     else
         printf("Palavra '%s' não encontrada na árvore.\n", palavraPT);
 }
-// --
 
+// (iii)informar uma palavra em inglês e e a unidade a qual a mesma pertence remove-la das árvores binárias das quais ela pertence. Caso ela seja a única palavra em uma das árvores binárias, remover também da árvore 2-3;
 int remover_ingles_unidade_aux(ArvoreVP **arvore, char *palavra_ingles, int unidade, char ***palavras_removidas, int *quant_removidas)
 {
     int removeu = 0;
@@ -154,6 +149,7 @@ int remover_ingles_unidade(ArvoreVP **arvore, char *palavra_ingles, int unidade)
     return removeu;
 }
 
+// (iv)informar uma palavra em português e a unidade a qual a mesma pertence e então remove-la, para isto deve remover a palavra em inglês da árvore binária correspondente a palavra em português da mesma unidade. Caso ela seja a única palavra na árvore binária, a palavra em português deve ser removida da árvore 2-3.
 int remover_portugues_unidade_aux(ArvoreBB **arvore, int unidade)
 {
     int removeu = 0;
@@ -209,36 +205,43 @@ void menu(ArvoreVP *arvore)
 
         switch (op)
         {
-        case 1:
-            leia_int("Digite uma unidade: ", &unidade);
-            printf("\n");
-            exibir_por_unidade(arvore, unidade);
-            break;
-        case 2:
-            leia_str("Digite uma palavra em português: ", palavra);
-            printf("\n");
-            exibir_traducao_em_ingles(arvore, palavra);
-            break;
-        case 3:
-            leia_int("Digite uma unidade: ", &unidade);
-            leia_str("Digite uma palavra em inglês: ", palavra);
-            printf("\n");
-            remover_ingles_unidade(&arvore, palavra, unidade);
-            break;
-        case 4:
-            leia_int("Digite uma unidade: ", &unidade);
-            leia_str("Digite uma palavra em português: ", palavra);
-            printf("\n");
-            break;
-        case 5:
-            arvorevp_exibir_pre(arvore);
-            break;
-        case 0: 
-            printf("Saindo...\n");
-            break;
-        default:
-        printf("Opção inválida!\n");
-            break;
+            case 1:
+                leia_int("Digite uma unidade: ", &unidade);
+                printf("\n");
+                exibir_por_unidade(arvore, unidade);
+                break;
+            case 2:
+                leia_str("Digite uma palavra em português: ", palavra);
+                printf("\n");
+                exibir_traducao_em_ingles(arvore, palavra);
+                break;
+            case 3:
+                leia_str("Digite uma palavra em inglês: ", palavra);
+                leia_int("Digite uma unidade: ", &unidade);
+                printf("\n");
+                if(remover_ingles_unidade(&arvore, palavra, unidade))
+                    printf("%s da unidade %d removido com sucesso\n", palavra, unidade);
+                else
+                    printf("%s da unidade %d não existe\n", palavra, unidade);
+                break;
+            case 4:
+                leia_str("Digite uma palavra em português: ", palavra);
+                leia_int("Digite uma unidade: ", &unidade);
+                printf("\n");
+                if(remover_portugues_unidade(&arvore, palavra, unidade))
+                    printf("%s da unidade %d removido com sucesso\n", palavra, unidade);
+                else
+                    printf("%s da unidade %d não existe\n", palavra, unidade);
+                break;
+            case 5:
+                arvorevp_exibir_ordem(arvore);
+                break;
+            case 0: 
+                printf("Saindo...\n");
+                break;
+            default:
+                printf("Opção inválida!\n");
+                break;
         }
         printf("\n");
     } while (op != 0);
@@ -251,29 +254,8 @@ int main()
     arvore = arvorevp_criar();
     processar_arquivo(dicionario, &arvore);
 
-    // char *palavra = {"Bug"};
-    // int unidade = 2;
-    // printf("\n[Removendo %s da Unidade %d]\n", palavra, unidade);
-    // remover_ingles_unidade(&arvore, palavra, unidade);
-    // remover_ingles_unidade(&arvore, palavra, 1);
-    // printf("\n\n");
-    //arvorevp_exibir_pre(arvore);
-
     menu(arvore);
-    // char *palavra = {"Fan"};
-    // int unidade = 2;
-    // printf("\n[Removendo %s da Unidade %d]\n", palavra, unidade);
-    // remover_ingles_unidade(&arvore, "Coller", 1);
-    // remover_ingles_unidade(&arvore, palavra, unidade);
-    // printf("\n\n");
-    //arvorevp_exibir_pre(arvore);
 
-    // char *palavra = {"ventilador"};
-    // int unidade = 1;
-    // printf("\n[Removendo %s da Unidade %d]\n", palavra, unidade);
-    // remover_portugues_unidade(&arvore, palavra, unidade);
-    // remover_portugues_unidade(&arvore, palavra, 2);
-    // printf("\n\n");
-    // arvorevp_exibir_pre(arvore);
+    arvorevp_desalocar(&arvore);
     return 0;
 }

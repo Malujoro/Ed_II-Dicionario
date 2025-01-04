@@ -62,11 +62,18 @@ Arvore23 *no23_alocar()
     return no;
 }
 
-// TODO desalocar palavras
 void no23_desalocar(Arvore23 **no)
 {
-    free(*no);
-    *no = NULL;
+    if(*no != NULL)
+    {
+        free((*no)->info1.palavraPT);
+        (*no)->info1.palavraPT = NULL;
+
+        arvorebb_desalocar(&((*no)->info1.palavrasEng));
+
+        free(*no);
+        *no = NULL;
+    }
 }
 
 Arvore23 *no23_criar(DataPT info, Arvore23 *filho_esquerdo, Arvore23 *filho_centro)
@@ -485,7 +492,6 @@ int arvore23_remover1(Arvore23 **raiz, char *info, Arvore23 *pai, Arvore23 **ori
                             int altura_menor_pai = calcular_altura(menor_pai);
                             int altura_pai_aux = calcular_altura(pai_aux);
 
-                            // TODO verificar condição do strcmp
                             if(pai_aux == NULL || (pai_aux != pai && menor_pai != NULL && altura_menor_pai <= altura_pai_aux && (strcmp(info_pai.palavraPT, menor_pai->info2.palavraPT) > 0)))
                             {
                                 *maior = pai;
@@ -746,257 +752,4 @@ void arvore23_exibir_pos(Arvore23 *raiz)
         if(raiz->n_infos == 2)
             printf("[2º] %s -> ", raiz->info2.palavraPT);
     }
-}
-
-/////////////////////////////////////////////////////////////////////////////////////////////
-// #define tamanhoVetor(v) (sizeof(v) / sizeof((v)[0]))
-
-// int *alocarCaso(int valores[],int tamanho){
-//     int *value;
-//     value = (int*)calloc(tamanho,sizeof(int));
-
-//     for(int i=0;i<tamanho;i++)
-//         value[i] = valores[i];
-
-//     return value;
-// }
-
-// int *caso_selecionado(int opc,int *tam){
-//     int *caso;
-
-//     if (opc == 1) {
-//         /*
-//             --Caso 1.2.3
-//         */
-//         int valores[] = {50, 100};
-//         *tam = tamanhoVetor(valores);
-//         caso = alocarCaso(valores, *tam);
-//     } else if (opc == 2) {
-//         /*
-//             --Caso 1.2.-3
-//         */
-//         int valores[] = {250, 100};
-//         *tam = tamanhoVetor(valores);
-//         caso = alocarCaso(valores, *tam);
-//     } else if (opc == 3) {
-//         /*
-//             --Caso 1.-2.3.4
-//         */
-//         int valores[] = {200, 100, 150};
-//         *tam = tamanhoVetor(valores);
-//         caso = alocarCaso(valores, *tam);
-//     } else if (opc == 4) {
-//         /*
-//             --Caso 1.-2.3.-4.5.6
-//         */
-//         int valores[] = {50, 100, 70, 200, 170};
-//         *tam = tamanhoVetor(valores);
-//         caso = alocarCaso(valores, *tam);
-//     } else if (opc == 5) {
-//         /*
-//             --Caso 1.-2.3.-4.5.-6
-//         */
-//         int valores[] = {50, 70, 60, 80, 100};
-//         *tam = tamanhoVetor(valores);
-//         caso = alocarCaso(valores, *tam);
-//     } else if (opc == 6) {
-//         /*
-//             --Caso 1.-2.3.-4.-5
-//         */
-//         int valores[] = {50, 70, 100};
-//         *tam = tamanhoVetor(valores);
-//         caso = alocarCaso(valores, *tam);
-//     } else if (opc == 7) {
-//         /*
-//             --Caso 1.-2.-3
-//         */
-//         int valores[] = {100};
-//         *tam = tamanhoVetor(valores);
-//         caso = alocarCaso(valores, *tam);
-//     } else if (opc == 8) {
-//         /*
-//             --Caso -1.2.3
-//         */
-//         int valores[] = {10, 50, 60, 30, 100, 150, 200, 80};
-//         *tam = tamanhoVetor(valores);
-//         caso = alocarCaso(valores, *tam);
-//     } else if (opc == 9) {
-//         /*
-//             --Caso -1.2.-3.4
-//         */
-//         int valores[] = {10, 50, 60, 30, 100, 150, 80};
-//         *tam = tamanhoVetor(valores);
-//         caso = alocarCaso(valores, *tam);
-//     } else if (opc == 10) {
-//         /*
-//             --Caso -1.2.-3.-4
-//         */
-//         int valores[] = {10, 50, 60, 30, 100, 150};
-//         *tam = tamanhoVetor(valores);
-//         caso = alocarCaso(valores, *tam);
-//     } else if (opc == 11) {
-//         /*
-//             --Caso -1.-2.3
-//         */
-//         int valores[] = {30, 120, 100, 170, 150, 200, 140, 50};
-//         *tam = tamanhoVetor(valores);
-//         caso = alocarCaso(valores, *tam);
-//     } else if (opc == 12) {
-//         /*
-//             --Caso -1.-2.-3.4
-//         */
-//         int valores[] = {30, 120, 100, 170, 150, 200, 140};
-//         *tam = tamanhoVetor(valores);
-//         caso = alocarCaso(valores, *tam);
-//     } else if (opc == 13) {
-//         /*
-//             --Caso -1.-2.-3.-4.5.6
-//         */
-//         int valores[] = {30, 120, 100, 170, 150, 200};
-//         *tam = tamanhoVetor(valores);
-//         caso = alocarCaso(valores, *tam);
-//     } else if (opc == 14) {
-//         /*
-//             --Caso -1.-2.-3.-4.5.-6
-//         */
-//         int valores[] = {30, 120, 100, 170, 150};
-//         *tam = tamanhoVetor(valores);
-//         caso = alocarCaso(valores, *tam);
-//     } else if (opc == 15) {
-//         /*
-//             --Caso -1.-2.-3.-4.-5.-6
-//         */
-//         int valores[] = {30, 120, 100};
-//         *tam = tamanhoVetor(valores);
-//         caso = alocarCaso(valores, *tam);
-//     } else if (opc == 16) {
-//         /*
-//             --Caso -1.-2.-3.-4.-5.6.7
-//         */
-//         int valores[] = {50, 150, 100, 200, 300, 350, 400, 500, 600, 450};
-//         *tam = tamanhoVetor(valores);
-//         caso = alocarCaso(valores, *tam);
-//     } else if (opc == 17) {
-//         /*
-//             --Caso -1.-2.-3.-4.-5.6.-7.8.9
-//         */
-//         int valores[] = {20,70,100,300,200,10,30,40,50,60,80,120,350,250,270};
-//         *tam = tamanhoVetor(valores);
-//         caso = alocarCaso(valores, *tam);
-//     } else if (opc == 18) {
-//         /*
-//             --Caso -1.-2.-3.-4.-5.6.-7.8.-9
-//         */
-//         int valores[] = {10,30,40,70,100,5,15,20,25,35,45,60,80,150};
-//         *tam = tamanhoVetor(valores);
-//         caso = alocarCaso(valores, *tam);
-
-//     } else if (opc == 19) {
-//         /*
-//             Caso -1.-2.-3.-4.-5.6.-7.-8
-//         */
-//         int valores[] = {10,30,20,70,80,100,120,40,50,60};
-//         *tam = tamanhoVetor(valores);
-//         caso = alocarCaso(valores, *tam);
-//     }
-    
-//     return caso;
-// }
-
-
-/////////////////////////////////////////////////////////////////////////////////////////////
-
-int main1()
-{
-    int tam;
-
-    // int valores[] = {5000, 4000, 1000, 2000, 1500, 500, 300, 6000, 8000, 7000};
-    // int valores[] = {8000, 10000, 15000, 1000, 3000, 7000, 5800, 4200, 2500, 1800, 9000, 7500, 6500, 4300, 3500, 9500, 2100, 500, 900, 100, 600, 1700, 2400, 1250, 1750, 250};
-    // char *valores[] = {"v", "y", "z", "f", "n", "t", "r", "p", "m", "j", "w", "u", "s", "q", "o", "x", "k", "c", "e", "a", "d", "h", "l", "g", "i", "b"};
-    char *valores[] = {"ônibus", "barramento", "inseto", "problema", "bicicleta", "ventilador", "rede de computadores", "sistema", "rede de relacionamento", "chave", "abacaxi", "armazenamento", "amigo", "arquivo", "bola", "cabo", "computador", "janela", "mesa", "ponteiro", "protocolo"};
-    // int valores[] = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'x', 'w', 'y', 'z'};
-    // int valores[] = {30, 120, 100, 50, 170, 150, 140, 200};
-    // int valores[] = {2, 4, 7, 3, 1, 6, 5};
-    // tam = sizeof(valores) / sizeof(int);
-    tam = sizeof(valores) / sizeof(char *);
-
-    Arvore23 *arvore, *arvore2;
-    arvore = arvore23_criar();
-    arvore2 = arvore23_criar();
-    DataPT *promove = (DataPT *) malloc(sizeof(DataPT));
-
-    for(int i = 0; i < tam; i++)
-    {
-        DataPT info;
-        info.palavraPT = valores[i];
-        
-        arvore23_inserir(&arvore, info, NULL, promove);
-        arvore23_inserir(&arvore2, info, NULL, promove);
-    }
-
-    printf("\n\nÁrvore após inserção: \n");
-    arvore23_exibir_pre(arvore);
-
-    for(int i = tam-1; i >= 0; i--)
-    {
-        arvore23_remover(&arvore, valores[i]);
-        printf("\n\nÁrvore após remover %s:\n", valores[i]);
-        arvore23_exibir_pre(arvore);
-    }
-
-    printf("\n\nÁrvore após inserção: \n");
-    arvore23_exibir_pre(arvore2);
-
-    for(int i = 0; i < tam; i++)
-    {
-        arvore23_remover(&arvore2, valores[i]);
-        printf("\n\nÁrvore após remover %s:\n", valores[i]);
-        arvore23_exibir_pre(arvore2);
-    }
-
-
-    printf("\n\n");
-    return 0;
-}
-
-// int main2()
-// {
-//     int tam, valor = 100;
-//     int *valores;
-
-//     Arvore23 *arvore;
-//     arvore = arvore23_criar();
-//     DataPT promove;
-
-//     for(int i = 1; i <= 19; i++)
-//     {
-//         printf("\n\n[%dº caso]", i);
-
-//         valores = caso_selecionado(i, &tam);
-//         for(int j = 0; j < tam; j++)
-//         {
-//             DataPT info;
-//             info.palavraPT = valores[j];
-//             arvore23_inserir(&arvore, info, NULL, &promove);
-//         }
-//         printf("\n\nÁrvore após inserção: \n");
-//         arvore23_exibir_pre(arvore);
-
-//         arvore23_remover(&arvore, valor);
-
-//         printf("\n\nÁrvore após remover %d:\n", valor);
-//         arvore23_exibir_pre(arvore);
-//         printf("\n\n");
-
-//         arvore23_desalocar(&arvore);
-//     }
-//     return 0;
-// }
-
-int main()
-{
-    main1();
-    // main2();
-
-    return 0;
 }
