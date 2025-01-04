@@ -19,6 +19,17 @@ typedef struct arvore23
     struct arvore23 *direito;
 } Arvore23;
 
+/*
+    Função para verificar se uma palavra está na info1
+    Retorna 1 caso sim, e 0 caso não
+*/
+int eh_info1(Arvore23 no, char *info);
+
+/*
+    Função para verificar se uma palavra está na info2
+    Retorna 1 caso sim, e 0 caso não
+*/
+int eh_info2(Arvore23 no, char *info);
 
 /*
     Função para alocar um nó da árvore
@@ -102,11 +113,10 @@ void arvore23_desalocar(Arvore23 **raiz);
 
 /*
     Função para adicionar uma informação na árvore (criando um nó)
-    Tem como parâmetro a referência da raiz da árvore, a informação a ser adicionada, o ponteiro para o pai, referência do "valor a ser promovido" e a referência do "nó inserido"
-    Retorna o endereço do "maior" nós (ocorrido quando há uma quebra)
-    Retorna por parâmetro endereço do nó inserido (ou o nó existente, caso seja repetido)
+    Tem como parâmetro a referência da raiz da árvore e a informação a ser adicionada
+    Retorna o endereço do nó inserido (ou o nó existente, caso seja repetido)
 */
-Arvore23 *arvore23_inserir(Arvore23 **raiz, DataPT info, Arvore23 *pai, DataPT *promove);
+Arvore23 *arvore23_inserir(Arvore23 **raiz, DataPT info);
 
 /*
     Função para remover um nó da árvore seguindo uma lógica de onda que "busca os valores da direita"

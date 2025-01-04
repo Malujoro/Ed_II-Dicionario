@@ -51,19 +51,27 @@ void exibir_por_unidade_bb(ArvoreBB *arvoreBB, char *palavraPT, int unidade)
     }
 }
 
-void exibir_por_unidade(ArvoreVP *raiz, int unidade)
+void exibir_por_unidade(Arvore23 *raiz, int unidade)
 {
     if(raiz != NULL)
     {
         exibir_por_unidade(raiz->esquerdo, unidade);
 
         ArvoreBB *arvoreBB;
-        arvoreBB = raiz->info.palavrasEng;
+        arvoreBB = raiz->info1.palavrasEng;
 
         if(arvoreBB != NULL) 
-            exibir_por_unidade_bb(arvoreBB, raiz->info.palavraPT, unidade);
+            exibir_por_unidade_bb(arvoreBB, raiz->info1.palavraPT, unidade);
+
+        exibir_por_unidade(raiz->centro, unidade);
             
-        exibir_por_unidade(raiz->direito, unidade);
+        if(raiz->n_infos == 2)
+        {
+            arvoreBB = raiz->info2.palavrasEng;
+            if(arvoreBB != NULL) 
+                exibir_por_unidade_bb(arvoreBB, raiz->info2.palavraPT, unidade);
+            exibir_por_unidade(raiz->direito, unidade);
+        }
     }
 }
 
@@ -79,16 +87,23 @@ void exibir_traducoes(ArvoreBB *arvoreBB)
         exibir_traducoes(arvoreBB->direito);
     }
 }
-void exibir_traducao_em_ingles(ArvoreVP *raiz, char *palavraPT)
+void exibir_traducao_em_ingles(Arvore23 *raiz, char *palavraPT)
 {
-     ArvoreVP *no = arvorevp_buscar(raiz, palavraPT);
+     Arvore23 *no = arvore23_buscar(raiz, palavraPT);
 
     if (no != NULL)
     {
         printf("Traduções para '%s':\n", palavraPT);
 
-        if (no->info.palavrasEng != NULL)
-            exibir_traducoes(no->info.palavrasEng);
+        ArvoreBB *arvoreBB;
+
+        if(eh_info1(*no, palavraPT))
+            arvoreBB = no->info1.palavrasEng;
+        else
+            arvoreBB = no->info2.palavrasEng;
+
+        if (arvoreBB != NULL)
+            exibir_traducoes(arvoreBB);
         else
             printf("Nenhuma tradução encontrada para '%s'.\n", palavraPT);
     }
@@ -97,45 +112,59 @@ void exibir_traducao_em_ingles(ArvoreVP *raiz, char *palavraPT)
 }
 
 // (iii)informar uma palavra em inglês e e a unidade a qual a mesma pertence remove-la das árvores binárias das quais ela pertence. Caso ela seja a única palavra em uma das árvores binárias, remover também da árvore 2-3;
-int remover_ingles_unidade_aux(ArvoreVP **arvore, char *palavra_ingles, int unidade, char ***palavras_removidas, int *quant_removidas)
+
+int remover_ingles_unidade_aux_info(DataPT info, char *palavra_ingles, int unidade, char ***palavras_removidas, int *quant_removidas)
 {
-    int removeu = 0;
+    int removeu;
+
     ArvoreBB *no;
-    
-    if(*arvore != NULL)
+    no = arvorebb_buscar(info.palavrasEng, palavra_ingles);
+
+    if(no != NULL)
     {
-        removeu = remover_ingles_unidade_aux(&((*arvore)->esquerdo), palavra_ingles, unidade, palavras_removidas, quant_removidas) || removeu;
-        removeu = remover_ingles_unidade_aux(&((*arvore)->direito), palavra_ingles, unidade, palavras_removidas, quant_removidas) || removeu;
+        int removeu_unidade = lista_remover(&(no->info.unidade), unidade);
+        removeu = removeu || removeu_unidade;
         
-        no = arvorebb_buscar((*arvore)->info.palavrasEng, palavra_ingles);
+        if(removeu_unidade && no->info.unidade == NULL)
+            arvorebb_remover((&(info.palavrasEng)), palavra_ingles);
+    }
 
-        if(no != NULL)
+    if(info.palavrasEng == NULL)
+    {            
+        (*quant_removidas)++;
+        char **aux;
+        aux = (char **) realloc(*palavras_removidas, (*quant_removidas) * sizeof(char **));
+
+        if(aux != NULL)
         {
-            int removeu_unidade = lista_remover(&(no->info.unidade), unidade);
-            removeu = removeu || removeu_unidade;
-            
-            if(removeu_unidade && no->info.unidade == NULL)
-                arvorebb_remover((&(*arvore)->info.palavrasEng), palavra_ingles);
-        }
-
-        if((*arvore)->info.palavrasEng == NULL)
-        {            
-            (*quant_removidas)++;
-            char **aux;
-            aux = (char **) realloc(*palavras_removidas, (*quant_removidas) * sizeof(char **));
-
-            if(aux != NULL)
-            {
-                *palavras_removidas = aux;
-                (*palavras_removidas)[(*quant_removidas) - 1] = (*arvore)->info.palavraPT;
-            }
+            *palavras_removidas = aux;
+            (*palavras_removidas)[(*quant_removidas) - 1] = info.palavraPT;
         }
     }
 
     return removeu;
 }
+
+int remover_ingles_unidade_aux(Arvore23 **arvore, char *palavra_ingles, int unidade, char ***palavras_removidas, int *quant_removidas)
+{
+    int removeu = 0;
     
-int remover_ingles_unidade(ArvoreVP **arvore, char *palavra_ingles, int unidade)
+    if(*arvore != NULL)
+    {
+        removeu = remover_ingles_unidade_aux(&((*arvore)->esquerdo), palavra_ingles, unidade, palavras_removidas, quant_removidas) || removeu;
+        removeu = remover_ingles_unidade_aux(&((*arvore)->centro), palavra_ingles, unidade, palavras_removidas, quant_removidas) || removeu;
+        if((*arvore)->n_infos == 2)
+            removeu = remover_ingles_unidade_aux(&((*arvore)->direito), palavra_ingles, unidade, palavras_removidas, quant_removidas) || removeu;
+        
+        removeu = remover_ingles_unidade_aux_info((*arvore)->info1, palavra_ingles, unidade, palavras_removidas, quant_removidas) || removeu;
+        if((*arvore)->n_infos == 2)
+           removeu = remover_ingles_unidade_aux_info((*arvore)->info2, palavra_ingles, unidade, palavras_removidas, quant_removidas) || removeu;
+    }
+
+    return removeu;
+}
+    
+int remover_ingles_unidade(Arvore23 **arvore, char *palavra_ingles, int unidade)
 {
     char **palavras_removidas;
     palavras_removidas = NULL;
@@ -144,7 +173,7 @@ int remover_ingles_unidade(ArvoreVP **arvore, char *palavra_ingles, int unidade)
     int removeu = remover_ingles_unidade_aux(arvore, palavra_ingles, unidade, &palavras_removidas, &quant_removidas);
 
     for(int i = 0; i < quant_removidas; i++)
-        arvorevp_remover(arvore, palavras_removidas[i]);
+        arvore23_remover(arvore, palavras_removidas[i]);
 
     return removeu;
 }
@@ -168,24 +197,30 @@ int remover_portugues_unidade_aux(ArvoreBB **arvore, int unidade)
     return removeu;
 }
 
-int remover_portugues_unidade(ArvoreVP **arvore, char *palavra_portugues, int unidade)
+int remover_portugues_unidade(Arvore23 **arvore, char *palavra_portugues, int unidade)
 {
     int removeu = 0;
-    ArvoreVP *no;
-    no = arvorevp_buscar(*arvore, palavra_portugues);
+    Arvore23 *no;
+    no = arvore23_buscar(*arvore, palavra_portugues);
 
     if(no != NULL)
     {
-        removeu = remover_portugues_unidade_aux(&(no->info.palavrasEng), unidade);
-        if(no->info.palavrasEng == NULL)
-            arvorevp_remover(arvore, palavra_portugues);
+        ArvoreBB **arvoreBB;
+        if(eh_info1(*no, palavra_portugues))
+            arvoreBB = &no->info1.palavrasEng;
+        else
+            arvoreBB = &no->info2.palavrasEng;
+        
+        removeu = remover_portugues_unidade_aux(arvoreBB, unidade);
+        if(*arvoreBB == NULL)
+            arvore23_remover(arvore, palavra_portugues);
     }
 
     return removeu;
 }
 
 
-void menu(ArvoreVP *arvore)
+void menu(Arvore23 *arvore)
 {
     int op, unidade;
     char *palavra;
@@ -234,7 +269,7 @@ void menu(ArvoreVP *arvore)
                     printf("[%s] da unidade [%d] não existe\n", palavra, unidade);
                 break;
             case 5:
-                arvorevp_exibir_ordem(arvore);
+                arvore23_exibir_ordem(arvore);
                 break;
             case 0: 
                 printf("Saindo...\n");
@@ -250,12 +285,28 @@ void menu(ArvoreVP *arvore)
 int main()
 {
     char *dicionario = "Dicionario.txt";
-    ArvoreVP *arvore;
-    arvore = arvorevp_criar();
+    Arvore23 *arvore;
+    arvore = arvore23_criar();
     processar_arquivo(dicionario, &arvore);
 
     menu(arvore);
 
-    arvorevp_desalocar(&arvore);
+    arvore23_desalocar(&arvore);
     return 0;
 }
+
+/*
+Palavra em português: barramento - Palavra em inglês: Bus
+Palavra em português: bicicleta - Palavra em inglês: Bike
+Palavra em português: inseto - Palavra em inglês: Bug |||
+Palavra em português: problema - Palavra em inglês: Bug
+Palavra em português: rede de computadores - Palavra em inglês: Network
+Palavra em português: sistema - Palavra em inglês: System
+Palavra em português: ventilador - Palavra em inglês: Coller |||
+Palavra em português: ônibus - Palavra em inglês: Bus
+
+Palavra em português: bicicleta - Palavra em inglês: Bicycle
+Palavra em português: inseto - Palavra em inglês: Bug
+Palavra em português: rede de relacionamento - Palavra em inglês: Network
+Palavra em português: ventilador - Palavra em inglês: Fan
+*/

@@ -113,7 +113,7 @@ void arvore23_desalocar(Arvore23 **raiz);
 
 /*
     Função para adicionar uma informação na árvore (criando um nó)
-    Tem como parâmetro a referência da raiz da árvore, a informação a ser adicionada, o ponteiro para o pai e a referência do "valor a ser promovido"
+    Tem como parâmetro a referência da raiz da árvore e a informação a ser adicionada
     Retorna o endereço do "maior" nós (ocorrido quando há uma quebra)
 */
 Arvore23 *arvore23_inserir(Arvore23 **raiz, Data info);

@@ -62,7 +62,7 @@ int identificar_traducoes(const char *linha, char *palavra_ingles, char traducoe
     return retorno; 
 }
 
-void processar_arquivo(const char *nome_arquivo, ArvoreVP **arvore) {
+void processar_arquivo(const char *nome_arquivo, Arvore23 **arvore) {
     FILE *arquivo;
     arquivo = abrir_arquivo(nome_arquivo);
     if (arquivo)
@@ -81,7 +81,8 @@ void processar_arquivo(const char *nome_arquivo, ArvoreVP **arvore) {
             int num_traducoes;
             DataPT infoPT;
             DataEng infoEng;
-            ArvoreVP *noVP;
+            Arvore23 *no23;
+            ArvoreBB **info;
             ArvoreBB *noBB;
 
             if (identificar_traducoes(linha, palavra_ingles, traducoes, &num_traducoes)) {
@@ -90,12 +91,17 @@ void processar_arquivo(const char *nome_arquivo, ArvoreVP **arvore) {
                     strcpy(infoPT.palavraPT, traducoes[i]);
                     
                     infoPT.palavrasEng = arvorebb_criar();
-                    noVP = arvorevp_inserir(arvore, infoPT);
+                    no23 = arvore23_inserir(arvore, infoPT);
+
+                    if(eh_info1(*no23, infoPT.palavraPT))
+                        info = &(no23->info1.palavrasEng);
+                    else
+                        info = &(no23->info2.palavrasEng);
 
                     infoEng.palavraIngles = alocar_str(50);
                     strcpy(infoEng.palavraIngles, palavra_ingles);
                     infoEng.unidade = lista_criar();
-                    noBB = arvorebb_inserir(&(noVP->info.palavrasEng), infoEng);
+                    noBB = arvorebb_inserir(info, infoEng);
 
                     lista_inserir(&(noBB->info.unidade), unidade_atual);
                 }

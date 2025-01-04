@@ -8,12 +8,12 @@ static int eh_folha(Arvore23 no)
     return no.esquerdo == NULL;
 }
 
-static int eh_info1(Arvore23 no, char *info)
+int eh_info1(Arvore23 no, char *info)
 {
     return strcmp(info, no.info1.palavraPT) == 0;
 }
 
-static int eh_info2(Arvore23 no, char *info)
+int eh_info2(Arvore23 no, char *info)
 {
     return no.n_infos == 2 && (strcmp(info, no.info2.palavraPT) == 0);
 }
@@ -66,11 +66,6 @@ void no23_desalocar(Arvore23 **no)
 {
     if(*no != NULL)
     {
-        free((*no)->info1.palavraPT);
-        (*no)->info1.palavraPT = NULL;
-
-        arvorebb_desalocar(&((*no)->info1.palavrasEng));
-
         free(*no);
         *no = NULL;
     }
@@ -89,13 +84,18 @@ Arvore23 *no23_criar(DataPT info, Arvore23 *filho_esquerdo, Arvore23 *filho_cent
     return no;
 }
 
-static Arvore23 *no23_quebrar(Arvore23 *no, DataPT info, DataPT *promove, Arvore23 *filho_maior)
+static Arvore23 *no23_quebrar(Arvore23 *no, DataPT info, DataPT *promove, Arvore23 *filho_maior, Arvore23 **no_escolhido, char *palavra_escolhida)
 {
     Arvore23 *maior;
+    int escolhida = ((*no_escolhido) == NULL) && (strcmp(info.palavraPT, palavra_escolhida) == 0);
+    
     if(strcmp(info.palavraPT, no->info2.palavraPT) > 0)
     {
         *promove = no->info2;
         maior = no23_criar(info, no->direito, filho_maior);
+
+        if(escolhida)
+            *no_escolhido = maior;
     }
     else if(strcmp(info.palavraPT, no->info1.palavraPT) > 0)
     {
@@ -108,6 +108,9 @@ static Arvore23 *no23_quebrar(Arvore23 *no, DataPT info, DataPT *promove, Arvore
         maior = no23_criar(no->info2, no->centro, no->direito);
         no->info1 = info;
         no->centro = filho_maior;
+
+        if(escolhida)
+            *no_escolhido = no;
     }
     no->n_infos = 1;
 
@@ -327,7 +330,7 @@ void arvore23_desalocar(Arvore23 **raiz)
     }
 }
 
-Arvore23 *arvore23_inserir(Arvore23 **raiz, DataPT info, Arvore23 *pai, DataPT *promove)
+Arvore23 *arvore23_inserir_no(Arvore23 **raiz, DataPT info, Arvore23 *pai, DataPT *promove, Arvore23 **no_escolhido)
 {
     Arvore23 *maior;
     maior = NULL;
@@ -336,52 +339,77 @@ Arvore23 *arvore23_inserir(Arvore23 **raiz, DataPT info, Arvore23 *pai, DataPT *
         *raiz = no23_criar(info, NULL, NULL);
     else
     {
-        if(eh_folha(**raiz))
-        {
-            if((*raiz)->n_infos == 1)
-                no23_adicionar_info(*raiz, info, NULL);
-            else
-            {
-                maior = no23_quebrar(*raiz, info, promove, NULL);
-                if(pai == NULL)
-                {
-                    *raiz = no23_criar(*promove, *raiz, maior);
-                    maior = NULL;
-                }
-            }
-        }
-        else
-        {
-            if(strcmp(info.palavraPT, (*raiz)->info1.palavraPT) < 0)
-                maior = arvore23_inserir(&((*raiz)->esquerdo), info, *raiz, promove);
-            else if((*raiz)->n_infos == 1 || (strcmp(info.palavraPT, (*raiz)->info2.palavraPT) < 0))
-                maior = arvore23_inserir(&((*raiz)->centro), info, *raiz, promove);
-            else
-                maior = arvore23_inserir(&((*raiz)->direito), info, *raiz, promove);
+        int existe = 0;
 
-            if(maior != NULL)
+        if(*no_escolhido == NULL && (eh_info1(**raiz, info.palavraPT) || eh_info2(**raiz, info.palavraPT)))
+        {
+            *no_escolhido = *raiz;
+            existe = 1;
+        }
+            
+        if(!existe)
+        {
+            if(eh_folha(**raiz))
             {
                 if((*raiz)->n_infos == 1)
-                {
-                    no23_adicionar_info(*raiz, *promove, maior);
-                    maior = NULL;
-                }
+                    no23_adicionar_info(*raiz, info, NULL);
                 else
                 {
-                    DataPT promove_aux;
-                    maior = no23_quebrar(*raiz, *promove, &promove_aux, maior);
-                    *promove = promove_aux;
+                    maior = no23_quebrar(*raiz, info, promove, NULL, no_escolhido, info.palavraPT);
+
                     if(pai == NULL)
                     {
-                        *raiz = no23_criar(promove_aux, *raiz, maior);
+                        *raiz = no23_criar(*promove, *raiz, maior);
+
                         maior = NULL;
+                    }
+                }
+            }
+            else
+            {
+                if(strcmp(info.palavraPT, (*raiz)->info1.palavraPT) < 0)
+                    maior = arvore23_inserir_no(&((*raiz)->esquerdo), info, *raiz, promove, no_escolhido);
+                else if((*raiz)->n_infos == 1 || (strcmp(info.palavraPT, (*raiz)->info2.palavraPT) < 0))
+                    maior = arvore23_inserir_no(&((*raiz)->centro), info, *raiz, promove, no_escolhido);
+                else
+                    maior = arvore23_inserir_no(&((*raiz)->direito), info, *raiz, promove, no_escolhido);
+
+                if(maior != NULL)
+                {
+                    if((*raiz)->n_infos == 1)
+                    {
+                        no23_adicionar_info(*raiz, *promove, maior);
+                        maior = NULL;
+                    }
+                    else
+                    {
+                        DataPT promove_aux;
+                        maior = no23_quebrar(*raiz, *promove, &promove_aux, maior, no_escolhido, info.palavraPT);
+                        *promove = promove_aux;
+                        if(pai == NULL)
+                        {
+                            *raiz = no23_criar(promove_aux, *raiz, maior);
+                            maior = NULL;
+                        }
                     }
                 }
             }
         }
     }
 
+    if(*no_escolhido == NULL && (eh_info1(**raiz, info.palavraPT) || eh_info2(**raiz, info.palavraPT)))
+        *no_escolhido = *raiz;
+
     return maior;
+}
+
+Arvore23 *arvore23_inserir(Arvore23 **raiz, DataPT info)
+{
+    DataPT promove;
+    Arvore23 *no_escolhido;
+    no_escolhido = NULL;
+    arvore23_inserir_no(raiz, info, NULL, &promove, &no_escolhido);
+    return no_escolhido;
 }
 
 static int arvore23_remover_no_interno1(Arvore23 **origem, Arvore23* raiz, DataPT *info, Arvore23 *filho1, Arvore23 *filho2, Arvore23 **maior)
@@ -708,13 +736,20 @@ int arvore23_rebalancear(Arvore23 **raiz, char *info, Arvore23 **maior)
     return balanceou;
 }
 
+void exibir_dataPT(DataPT info)
+{
+    printf("Palavra[PT]: %s\n", info.palavraPT);
+    arvorebb_exibir_pre(info.palavrasEng);
+    printf("\n");
+}
+
 void arvore23_exibir_pre(Arvore23 *raiz)
 {
     if(raiz != NULL)
     {
-        printf("[1º] %s -> ", raiz->info1.palavraPT);
+        exibir_dataPT(raiz->info1);
         if(raiz->n_infos == 2)
-            printf("[2º] %s -> ", raiz->info2.palavraPT);
+            exibir_dataPT(raiz->info2);
 
         arvore23_exibir_pre(raiz->esquerdo);
         arvore23_exibir_pre(raiz->centro);
@@ -728,12 +763,12 @@ void arvore23_exibir_ordem(Arvore23 *raiz)
     if(raiz != NULL)
     {
         arvore23_exibir_ordem(raiz->esquerdo);
-        printf("[1º] %s -> ", raiz->info1.palavraPT);
+        exibir_dataPT(raiz->info1);
         arvore23_exibir_ordem(raiz->centro);
 
         if(raiz->n_infos == 2)
         {
-            printf("[2º] %s -> ", raiz->info2.palavraPT);
+            exibir_dataPT(raiz->info2);
             arvore23_exibir_ordem(raiz->direito);
         }
     }
@@ -748,8 +783,8 @@ void arvore23_exibir_pos(Arvore23 *raiz)
         if(raiz->n_infos == 2)
             arvore23_exibir_pos(raiz->direito);
 
-        printf("[1º] %s -> ", raiz->info1.palavraPT);
+        exibir_dataPT(raiz->info1);
         if(raiz->n_infos == 2)
-            printf("[2º] %s -> ", raiz->info2.palavraPT);
+           exibir_dataPT(raiz->info2);
     }
 }
