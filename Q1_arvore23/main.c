@@ -294,19 +294,3 @@ int main()
     arvore23_desalocar(&arvore);
     return 0;
 }
-
-/*
-Palavra em português: barramento - Palavra em inglês: Bus
-Palavra em português: bicicleta - Palavra em inglês: Bike
-Palavra em português: inseto - Palavra em inglês: Bug |||
-Palavra em português: problema - Palavra em inglês: Bug
-Palavra em português: rede de computadores - Palavra em inglês: Network
-Palavra em português: sistema - Palavra em inglês: System
-Palavra em português: ventilador - Palavra em inglês: Coller |||
-Palavra em português: ônibus - Palavra em inglês: Bus
-
-Palavra em português: bicicleta - Palavra em inglês: Bicycle
-Palavra em português: inseto - Palavra em inglês: Bug
-Palavra em português: rede de relacionamento - Palavra em inglês: Network
-Palavra em português: ventilador - Palavra em inglês: Fan
-*/
