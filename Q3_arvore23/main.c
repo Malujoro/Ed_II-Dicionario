@@ -27,7 +27,7 @@ void leia_numero_no(char *texto, int *variavel, int minimo, int maximo)
 
 int quantidade_disponivel(Data info)
 {
-    return info.numero_final - info.numero_inicial + 1;
+    return info.endereco_final - info.endereco_inicial + 1;
 }
 
 int cadastrar_nos(Arvore23 **arvore, int maximo)
@@ -46,18 +46,20 @@ int cadastrar_nos(Arvore23 **arvore, int maximo)
     } while(status != LIVRE && status != OCUPADO);
 
     Data no, promove;
-    leia_numero_no("\nEndereço inicial: ", &no.numero_inicial, 0, maximo);
-    int minimo = no.numero_inicial;
+    leia_numero_no("\nEndereço inicial: ", &no.endereco_inicial, 0, maximo);
+    int minimo = no.endereco_inicial;
     do
     {
         no.status = status;
-        leia_numero_no("\nEndereço final: ", &no.numero_final, no.numero_inicial, maximo);
+        no.bloco_inicial = minimo;
+        no.bloco_final = maximo - 1;
+        leia_numero_no("\nEndereço final: ", &no.endereco_final, no.endereco_inicial, maximo);
 
         arvore23_inserir(arvore, no);
 
-        no.numero_inicial = no.numero_final + 1;
+        no.endereco_inicial = no.endereco_final + 1;
         status = !status;
-    }while(no.numero_final < (maximo - 1));
+    }while(no.endereco_final < (maximo - 1));
 
     return minimo;
 }
@@ -98,9 +100,9 @@ Arvore23 *buscar_no_memoria(Arvore23 **arvore, int quant, int status, Data **inf
     return no;
 }
 
-void concatenar_no(Arvore23 **raiz, int *numero_final, int limite, int valor_remover)
+void concatenar_no(Arvore23 **raiz, int *endereco_final, int limite, int valor_remover)
 {
-    *numero_final = limite;
+    *endereco_final = limite;
     arvore23_remover(raiz, valor_remover);
 }
 
@@ -111,20 +113,20 @@ Arvore23 *buscar_menor_bloco(Arvore23 **raiz, Arvore23 *no, Data *info, Data **v
 
     if(eh_folha(*no))
     {
-        if(no->info1.numero_inicial != info->numero_inicial)
+        if(no->info1.endereco_inicial != info->endereco_inicial)
             menor = no;
         else
-            menor = arvore23_buscar_menor_pai(*raiz, info->numero_inicial);
+            menor = arvore23_buscar_menor_pai(*raiz, info->endereco_inicial);
 
         if(menor != NULL)
         {
-            if(menor->n_infos == 2 && menor->info2.numero_inicial < info->numero_inicial)
+            if(menor->n_infos == 2 && menor->info2.endereco_inicial < info->endereco_inicial)
                 *valor_menor = &(menor->info2);
             else
                 *valor_menor = &(menor->info1);
         }
     }
-    else if(no->info1.numero_inicial == info->numero_inicial)
+    else if(no->info1.endereco_inicial == info->endereco_inicial)
         menor = arvore23_buscar_maior_filho(no->esquerdo, &pai, valor_menor);
     else
         menor = arvore23_buscar_maior_filho(no->centro, &pai, valor_menor);
@@ -140,14 +142,14 @@ Arvore23 *buscar_maior_bloco(Arvore23 **raiz, Arvore23 *no, Data *info, Data **v
 
     if(eh_folha(*no))
     {
-        if(no->n_infos == 2 && no->info1.numero_inicial == info->numero_inicial)
+        if(no->n_infos == 2 && no->info1.endereco_inicial == info->endereco_inicial)
             maior = no;
         else
-            maior = arvore23_buscar_maior_pai(*raiz, info->numero_inicial);
+            maior = arvore23_buscar_maior_pai(*raiz, info->endereco_inicial);
 
         if(maior != NULL)
         {
-            if(maior->info1.numero_inicial > info->numero_inicial)
+            if(maior->info1.endereco_inicial > info->endereco_inicial)
                 *valor_maior = &(maior->info1);
             else
                 *valor_maior = &(maior->info2);
@@ -155,7 +157,7 @@ Arvore23 *buscar_maior_bloco(Arvore23 **raiz, Arvore23 *no, Data *info, Data **v
     }
     else
     {
-        if(no->info1.numero_inicial == info->numero_inicial)
+        if(no->info1.endereco_inicial == info->endereco_inicial)
             maior = arvore23_buscar_menor_filho(no->centro, &pai);
         else
             maior = arvore23_buscar_menor_filho(no->direito, &pai);
@@ -179,17 +181,19 @@ void modificar_no(Arvore23 **raiz, Arvore23 *no, Data *info, int quant)
         if(menor == NULL)
         {
             Data data;
-            data.numero_inicial = info->numero_inicial;
-            data.numero_final = info->numero_inicial + quant - 1;
+            data.bloco_inicial = info->bloco_inicial;
+            data.bloco_final = info->bloco_final;
+            data.endereco_inicial = info->endereco_inicial;
+            data.endereco_final = info->endereco_inicial + quant - 1;
             data.status = !(info->status);
 
-            info->numero_inicial += quant;
+            info->endereco_inicial += quant;
             arvore23_inserir(raiz, data);
         }
         else
         {
-            valor_menor->numero_final += quant;
-            info->numero_inicial += quant;
+            valor_menor->endereco_final += quant;
+            info->endereco_inicial += quant;
         }
     }
     else
@@ -206,14 +210,14 @@ void modificar_no(Arvore23 **raiz, Arvore23 *no, Data *info, int quant)
             if(menor == NULL)
             {
                 info->status = !(info->status);
-                concatenar_no(raiz, &(info->numero_final), valor_maior->numero_final, valor_maior->numero_inicial);
+                concatenar_no(raiz, &(info->endereco_final), valor_maior->endereco_final, valor_maior->endereco_inicial);
             }
             else if(maior == NULL)
-                concatenar_no(raiz, &(valor_menor->numero_final), info->numero_final, info->numero_inicial);
+                concatenar_no(raiz, &(valor_menor->endereco_final), info->endereco_final, info->endereco_inicial);
             else
             {
-                int numero = valor_maior->numero_inicial;
-                concatenar_no(raiz, &(valor_menor->numero_final), valor_maior->numero_final, info->numero_inicial);
+                int numero = valor_maior->endereco_inicial;
+                concatenar_no(raiz, &(valor_menor->endereco_final), valor_maior->endereco_final, info->endereco_inicial);
                 arvore23_remover(raiz, numero);
             }
         }
@@ -253,7 +257,7 @@ int menu()
     return op;
 }
 
-int main_main()
+int main()
 {
     Arvore23 *arvore;
     arvore = arvore23_criar();
@@ -312,49 +316,4 @@ int main_main()
     
     arvore23_desalocar(&arvore);
     return 0;
-}
-
-int main_teste()
-{
-    Arvore23 *arvore;
-    arvore = arvore23_criar();
-
-    int valores[] = {10, 20, 29};
-    int tam = sizeof(valores) / sizeof(int);
-    int inicio = 0, status = OCUPADO;
-    Data no;
-
-    for(int i = 0; i < tam; i++)
-    {
-        no.numero_inicial = inicio;
-        no.numero_final = valores[i];
-        no.status = status;
-
-        arvore23_inserir(&arvore, no);
-
-        status = !status;
-        inicio = no.numero_final + 1;
-    }
-
-    arvore23_exibir_ordem(arvore);
-
-    int vetor_nos[] = {5};
-    int vetor_status[] = {OCUPADO};
-    int quant1 = sizeof(vetor_nos) / sizeof(int);
-    int quant2 = sizeof(vetor_status) / sizeof(int);
-    int quant = quant1 <= quant2 ? quant1 : quant2;
-
-    for(int i = 0; i < quant; i++)
-    {
-        alocar_desalocar_no(&arvore, vetor_nos[i], vetor_status[i]);
-        printf("\n");
-        arvore23_exibir_ordem(arvore);
-        printf("\n");
-    }
-}
-
-int main()
-{
-    main_teste();
-    // main_main();
 }

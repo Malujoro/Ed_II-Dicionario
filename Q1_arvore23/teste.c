@@ -78,6 +78,33 @@ tempo_tipo calcular_tempo_medio(Arvore23 **arvore, char *info, int repeticoes)
     return media;
 }
 
+Arvore23 *arvore23_buscar_caminho(Arvore23 *raiz, char *info)
+{
+    Arvore23 *no;
+    no = NULL;
+
+    if(raiz != NULL)
+    {
+        printf("[1º] %s ", raiz->info1.palavraPT);
+
+        if(raiz->n_infos == 2)
+            printf("| [2º] %s ", raiz->info2.palavraPT);
+        
+        printf("-> ");
+
+        if(eh_info1(*raiz, info) || eh_info2(*raiz, info))
+            no = raiz;
+        else if(strcmp(info, raiz->info1.palavraPT) < 0)
+            no = arvore23_buscar_caminho(raiz->esquerdo, info);
+        else if(raiz->n_infos == 1 || (strcmp(info, raiz->info2.palavraPT) < 0))
+            no = arvore23_buscar_caminho(raiz->centro, info);
+        else
+            no = arvore23_buscar_caminho(raiz->direito, info);
+    }
+
+    return no;
+}
+
 int main()
 {
     srand(1);
@@ -85,7 +112,7 @@ int main()
     int tamanho = 5, repeticoes = 30;
     int quant_nos = pow(26, tamanho);
 
-    char palavras[][50] =  {"Amor", "Biscoito", "Carro", "Dado", "Elefante", "Futebol", "Gato", "Homem", "Igreja", "Jacaré", "Kiwi", "Laranja", "Montanha", "Navio", "Ovo", "Pato", "Queijo", "Rato", "Sapato", "Tigre", "Uva", "Vento", "Wesley", "Xadrez", "Yasmin", "Zebra", "Porta", "Jardim", "Livro", "Telefone"};
+    char palavras[][50] =  {"amor", "biscoito", "carro", "dado", "elefante", "futebol", "gato", "homem", "igreja", "jacaré", "kiwi", "laranja", "montanha", "navio", "ovo", "pato", "queijo", "rato", "sapato", "tigre", "uva", "vento", "wesley", "xadrez", "yasmin", "zebra", "porta", "jardim", "livro", "telefone"};
 
     int quant_palavras = sizeof(palavras) / sizeof(char [50]);
 
@@ -99,11 +126,13 @@ int main()
         DataPT info = preencher_no(palavras[i]);
         arvore23_inserir(&arvore, info);
     }
+
     for(int i = 0; i < quant_palavras; i++)
     {
+        // arvore23_buscar_caminho(arvore, palavras[i]);
+        // printf("\n");
         tempo_tipo media = calcular_tempo_medio(&arvore, palavras[i], repeticoes);
         printf("[%dº] [%s] Tempo médio de execução: %lf microssegundos\n\n", i+1, palavras[i], media);
-
     }
     printf("\n[Árvore de %d elementos]\n", quant_nos + quant_palavras);
     arvore23_desalocar(&arvore);

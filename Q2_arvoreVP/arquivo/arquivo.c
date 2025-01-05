@@ -94,6 +94,7 @@ void processar_arquivo(const char *nome_arquivo, ArvoreVP **arvore) {
 
                     infoEng.palavraIngles = alocar_str(50);
                     strcpy(infoEng.palavraIngles, palavra_ingles);
+                    
                     infoEng.unidade = lista_criar();
                     noBB = arvorebb_inserir(&(noVP->info.palavrasEng), infoEng);
 

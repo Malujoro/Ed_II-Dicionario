@@ -11,7 +11,7 @@
                 "-o",
                 "${fileDirname}/${fileBasenameNoExtension}",
                 "${fileDirname}/arvore/arvore.c",
-                "${fileDirname}/arquivo/arquivo.c",
+                // "${fileDirname}/arquivo/arquivo.c",
                 "${fileDirname}/../binaria/arvore.c",
                 "${fileDirname}/../lista/lista.c",
                 "-lm",

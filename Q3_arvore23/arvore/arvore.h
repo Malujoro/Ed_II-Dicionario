@@ -7,10 +7,10 @@
 
 typedef struct data
 {
-    int numero_inicial;
-    int numero_final;
-    int *endereco_inicial;
-    int *endereco_final;
+    int bloco_inicial;
+    int bloco_final;
+    int endereco_inicial;
+    int endereco_final;
     int status;
 } Data;
 

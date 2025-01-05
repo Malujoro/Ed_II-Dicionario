@@ -78,6 +78,29 @@ tempo_tipo calcular_tempo_medio(ArvoreVP **arvore, char *info, int repeticoes)
     return media;
 }
 
+ArvoreVP *arvorevp_buscar_caminho(ArvoreVP *raiz, char *palavra)
+{
+    ArvoreVP *retorno;
+
+    if(raiz != NULL)
+    {
+        printf("%s -> ", raiz->info.palavraPT);
+
+        int resultado = strcmp(palavra, raiz->info.palavraPT);
+
+        if(resultado == 0)
+            retorno = raiz;
+        else if(resultado < 0)
+            retorno = arvorevp_buscar_caminho(raiz->esquerdo, palavra);
+        else if(resultado > 0)
+            retorno = arvorevp_buscar_caminho(raiz->direito, palavra);
+    }
+    else
+        retorno = NULL;
+    
+    return retorno;
+}
+
 int main()
 {
     srand(1);
@@ -85,7 +108,7 @@ int main()
     int tamanho = 5, repeticoes = 30;
     int quant_nos = pow(26, tamanho);
 
-    char palavras[][50] =  {"Amor", "Biscoito", "Carro", "Dado", "Elefante", "Futebol", "Gato", "Homem", "Igreja", "Jacaré", "Kiwi", "Laranja", "Montanha", "Navio", "Ovo", "Pato", "Queijo", "Rato", "Sapato", "Tigre", "Uva", "Vento", "Wesley", "Xadrez", "Yasmin", "Zebra", "Porta", "Jardim", "Livro", "Telefone"};
+    char palavras[][50] =  {"amor", "biscoito", "carro", "dado", "elefante", "futebol", "gato", "homem", "igreja", "jacaré", "kiwi", "laranja", "montanha", "navio", "ovo", "pato", "queijo", "rato", "sapato", "tigre", "uva", "vento", "wesley", "xadrez", "yasmin", "zebra", "porta", "jardim", "livro", "telefone"};
 
     int quant_palavras = sizeof(palavras) / sizeof(char [50]);
 
@@ -101,6 +124,7 @@ int main()
     }
     for(int i = 0; i < quant_palavras; i++)
     {
+        // arvorevp_buscar_caminho(arvore, palavras[i]);
         tempo_tipo media = calcular_tempo_medio(&arvore, palavras[i], repeticoes);
         printf("[%dº] [%s] Tempo médio de execução: %lf microssegundos\n\n", i+1, palavras[i], media);
 

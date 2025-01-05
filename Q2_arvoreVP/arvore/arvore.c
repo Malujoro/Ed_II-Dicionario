@@ -214,7 +214,7 @@ void mover_esquerda(ArvoreVP **raiz)
 {
     trocar_cor(*raiz);
 
-    if(retornar_cor((*raiz)->direito->esquerdo) == VERMELHO)
+    if((*raiz)->direito != NULL && retornar_cor((*raiz)->direito->esquerdo) == VERMELHO)
     {
         rotacao_direita(&((*raiz)->direito));
         rotacao_esquerda(raiz);
@@ -226,7 +226,7 @@ void mover_direita(ArvoreVP **raiz)
 {
     trocar_cor(*raiz);
 
-    if(retornar_cor((*raiz)->esquerdo->esquerdo) == VERMELHO)
+    if((*raiz)->esquerdo != NULL && retornar_cor((*raiz)->esquerdo->esquerdo) == VERMELHO)
     {
         rotacao_direita(raiz);
         trocar_cor(*raiz);
